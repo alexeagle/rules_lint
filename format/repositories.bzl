@@ -52,6 +52,14 @@ def fetch_ktfmt():
         url = "https://repo1.maven.org/maven2/com/facebook/ktfmt/0.46/ktfmt-0.46-jar-with-dependencies.jar",
     )
 
+def _jvm_dependencies_impl(_ctx):
+    fetch_ktfmt()
+    fetch_java_format()
+
+jvm_dependencies = module_extension(
+    implementation = _jvm_dependencies_impl,
+)
+
 def fetch_swiftformat():
     # TODO: after https://github.com/bazelbuild/rules_swift/issues/864 we should only fetch for host
     http_archive(
@@ -73,3 +81,10 @@ def fetch_swiftformat():
         sha256 = "978eaffdc3716bbc0859aecee0d83875cf3ab8d8725779448f0035309d9ad9f3",
         url = "https://github.com/nicklockwood/SwiftFormat/releases/download/0.49.17/swiftformat.zip",
     )
+
+def _swift_dependencies_impl(_ctx):
+    fetch_swiftformat()
+
+swift_dependencies = module_extension(
+    implementation = _swift_dependencies_impl,
+)

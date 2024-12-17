@@ -135,3 +135,13 @@ Run Vale as an action under Bazel.
 | <a id="vale_action-env"></a>env |  environment variables for vale   |  `{}` |
 
 
+<a id="vale_dependencies"></a>
+
+## vale_dependencies
+
+<pre>
+vale_dependencies = use_extension("@aspect_rules_lint//lint:vale.bzl", "vale_dependencies")
+</pre>
+
+
+

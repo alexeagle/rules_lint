@@ -18,18 +18,13 @@ concurrency:
 
 jobs:
   bazel-test:
-    uses: bazel-contrib/.github/.github/workflows/bazel.yaml@v6
+    uses: bazel-contrib/.github/.github/workflows/bazel.yaml@v7
     with:
       folders: '[".", "example"]'
       # Don't try for Windows support yet.
       exclude_windows: true
-      # Root module is bzlmod-only and uses newer stardoc that requires Bazel 7.
-      # Example uses incompatible_enable_proto_toolchain_resolution
       exclude: |
-        [
-          {"bzlmodEnabled": false, "folder": "."},
-          {"bazelversion": "6.4.0"}
-        ]
+        [{"bzlmodEnabled": false, "folder": "."}]
 
   integration-test:
     runs-on: ubuntu-latest

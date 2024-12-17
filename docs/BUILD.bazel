@@ -1,6 +1,7 @@
 # This load statement must be in the docs/ package rather than anything users depend on
 # so that the dependency on stardoc doesn't leak to them.
 load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
+load("@bazel_features//:features.bzl", "bazel_features")
 
 stardoc_with_diff_test(
     name = "lint_test",
@@ -35,6 +36,7 @@ stardoc_with_diff_test(
 stardoc_with_diff_test(
     name = "format",
     bzl_library_target = "//format:defs",
+    target_compatible_with = ["@platforms//:incompatible"] if bazel_features.docs.kwargs_name_with_double_star else [],
 )
 
 stardoc_with_diff_test(

@@ -1,4 +1,7 @@
 version: v2
 lint:
   use:
-    - IMPORT_USED
+    - DEFAULT
+  except:
+    - RPC_REQUEST_STANDARD_NAME
+    - PACKAGE_DEFINED

@@ -1,3 +1,16 @@
 syntax = "proto3";
 
 import "src/unused.proto";
+
+message HttpBody {
+  string name = 1;
+}
+
+message Empty {}
+
+service HttpService {
+  // Receives an inbound message an http client.
+  // buf:lint:ignore RPC_RESPONSE_STANDARD_NAME
+  // buf:lint:ignore RPC_REQUEST_RESPONSE_UNIQUE
+  rpc ReceiveMessage(HttpBody) returns (Empty) {}
+}

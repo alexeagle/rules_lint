@@ -9,6 +9,8 @@ buf = buf_lint_aspect(
     config = "@@//path/to:buf.yaml",
 )
 ```
+
+**Important:** while using buf's [`allow_comment_ignores` functionality](https://buf.build/docs/configuration/v1/buf-yaml#allow_comment_ignores), the bazel flag `--experimental_proto_descriptor_sets_include_source_info` is required.
 """
 
 load("@rules_proto//proto:defs.bzl", "ProtoInfo")

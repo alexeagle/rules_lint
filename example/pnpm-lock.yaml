@@ -16,6 +16,9 @@ devDependencies:
   "@eslint/js":
     specifier: ^9.16.0
     version: 9.16.0
+  "@prettier/plugin-xml":
+    specifier: ^0.10.0
+    version: 0.10.0
   "@types/node":
     specifier: ^18
     version: 18.0.0
@@ -291,6 +294,16 @@ packages:
       fastq: 1.15.0
     dev: true
 
+  /@prettier/plugin-xml@0.10.0:
+    resolution:
+      {
+        integrity: sha512-8Pmkik2wH4sT6cVdeRN3MpzniFxzOWH0fLRnLJwMXSPMyz9ZKdVm4bg5oAWG96LABue0/W4cCr+oXuEslTTAUA==,
+      }
+    dependencies:
+      "@xml-tools/parser": 1.0.11
+      prettier: 2.8.8
+    dev: true
+
   /@types/estree@1.0.6:
     resolution:
       {
@@ -465,6 +478,15 @@ packages:
     dependencies:
       "@typescript-eslint/types": 8.17.0
       eslint-visitor-keys: 4.2.0
+    dev: true
+
+  /@xml-tools/parser@1.0.11:
+    resolution:
+      {
+        integrity: sha512-aKqQ077XnR+oQtHJlrAflaZaL7qZsulWc/i/ZEooar5JiWj1eLt0+Wg28cpa+XLney107wXqneC+oG1IZvxkTA==,
+      }
+    dependencies:
+      chevrotain: 7.1.1
     dev: true
 
   /acorn-jsx@5.3.2(acorn@8.14.0):
@@ -651,6 +673,15 @@ packages:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
+    dev: true
+
+  /chevrotain@7.1.1:
+    resolution:
+      {
+        integrity: sha512-wy3mC1x4ye+O+QkEinVJkPf5u2vsrDIYW9G7ZuwFl6v/Yu0LwUuT2POsb+NUWApebyxfkQq6+yDfRExbnI5rcw==,
+      }
+    dependencies:
+      regexp-to-ast: 0.5.0
     dev: true
 
   /color-convert@1.9.3:
@@ -1763,6 +1794,13 @@ packages:
     dependencies:
       discontinuous-range: 1.0.0
       ret: 0.1.15
+    dev: true
+
+  /regexp-to-ast@0.5.0:
+    resolution:
+      {
+        integrity: sha512-tlbJqcMHnPKI9zSrystikWKwHkBqu2a/Sgw01h3zFjvYrMxEDYHzzoMZnUrbIfpTFEsoRnnviOXNCzFiSc54Qw==,
+      }
     dev: true
 
   /require-from-string@2.0.2:

@@ -48,7 +48,10 @@ js_library(
 js_library(
     name = "prettierrc",
     srcs = ["prettier.config.cjs"],
-    deps = [":node_modules/prettier-plugin-sql"],
+    deps = [
+        ":node_modules/@prettier/plugin-xml",
+        ":node_modules/prettier-plugin-sql",
+    ],
 )
 
 # NB: this alias does NOT cause Bazel's Loading phase to load the tools/BUILD file.

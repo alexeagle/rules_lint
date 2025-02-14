@@ -178,6 +178,9 @@ def _is_source(file):
 
 # modification of filter_srcs in lint_aspect.bzl that filters out header files
 def _filter_srcs(rule):
+    # some rules can return a CcInfo without having a srcs attribute
+    if not hasattr(rule.attr, "srcs"):
+        return []
     if "lint-genfiles" in rule.attr.tags:
         return rule.files.srcs
     else:
@@ -270,6 +273,12 @@ def _get_compiler_args(ctx, compilation_context, srcs):
         args.append("-D" + define)
     for define in compilation_context.local_defines.to_list():
         args.append("-D" + define)
+    if hasattr(ctx.rule.attr, "defines"):
+        for define in ctx.rule.attr.defines:
+            args.append("-D" + define)
+    if hasattr(ctx.rule.attr, "local_defines"):
+        for define in ctx.rule.attr.local_defines:
+            args.append("-D" + define)
 
     # add includes
     args.extend(_prefixed(compilation_context.framework_includes.to_list(), "-F"))

@@ -13,6 +13,7 @@ cc_library(
         "hello-time.h",
         "xhello-time.h",
     ],
+    local_defines = ["LOCAL_DEFINE_IS_DEFINED=\\\"a_string\\\""],
     includes = ["."],
     visibility = ["//src/cpp/main:__pkg__"],
 )

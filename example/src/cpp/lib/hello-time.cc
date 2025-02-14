@@ -11,4 +11,8 @@ void print_localtime() {
   // warning: do not call c-style vararg functions
   // [cppcoreguidelines-pro-type-vararg,hicpp-vararg]
   printf("%s\n", localtime);
+
+  // local defines are added to clang-tidy so it can compile
+  static const char* str = LOCAL_DEFINE_IS_DEFINED;
+  printf("%s\n   ", str);
 }

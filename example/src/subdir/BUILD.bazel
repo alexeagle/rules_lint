@@ -24,3 +24,8 @@ ts_project(
         "//:node_modules/moment",
     ],
 )
+
+java_library(
+    name = "bar",
+    srcs = ["Bar.java"],
+)

@@ -32,6 +32,13 @@ load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "filter_srcs", "noop_l
 
 _MNEMONIC = "AspectRulesLintCheckstyle"
 
+def rebuild_map(configs):
+    directory_to_config = {}
+    for config, directories in configs.items():
+        for directory in directories.split(","):
+            directory_to_config[directory] = config
+    return directory_to_config
+
 def checkstyle_action(ctx, executable, srcs, config, data, stdout, exit_code = None, options = []):
     """Run Checkstyle as an action under Bazel.
 
@@ -42,6 +49,7 @@ def checkstyle_action(ctx, executable, srcs, config, data, stdout, exit_code = N
         executable: label of the the Checkstyle program
         srcs: java files to be linted
         config: label of the checkstyle.xml file
+        configs: dictionary mapping package label to their respective checkstyle.xml file
         data: labels of additional xml files such as suppressions.xml
         stdout: output file to generate
         exit_code: output file to write the exit code.
@@ -82,6 +90,17 @@ def _checkstyle_aspect_impl(target, ctx):
         return []
 
     files_to_lint = filter_srcs(ctx.rule)
+    config_file = ctx.file._config
+    config_maps = rebuild_map(ctx.attr._configs)
+    if ctx.attr._configs:
+        label = str(target.label)
+        keys = sorted(config_maps.keys(), key=len, reverse = True)
+        for key in keys:
+            if label.startswith(key):
+                config = config_maps[key]
+                config_file = config.files.to_list()[0]
+                break
+
     outputs, info = output_files(_MNEMONIC, target, ctx)
     if len(files_to_lint) == 0:
         noop_lint_action(ctx, outputs)
@@ -91,7 +110,7 @@ def _checkstyle_aspect_impl(target, ctx):
         ctx,
         ctx.executable._checkstyle,
         files_to_lint,
-        ctx.file._config,
+        config_file,
         ctx.files._data,
         outputs.human.out,
         outputs.human.exit_code,
@@ -101,7 +120,7 @@ def _checkstyle_aspect_impl(target, ctx):
         ctx,
         ctx.executable._checkstyle,
         files_to_lint,
-        ctx.file._config,
+        config_file,
         ctx.files._data,
         outputs.machine.out,
         outputs.machine.exit_code,
@@ -109,7 +128,7 @@ def _checkstyle_aspect_impl(target, ctx):
     )
     return [info]
 
-def lint_checkstyle_aspect(binary, config, data = [], rule_kinds = ["java_binary", "java_library"]):
+def lint_checkstyle_aspect(binary, config, configs = {}, data = [], rule_kinds = ["java_binary", "java_library"]):
     """A factory function to create a linter aspect.
 
     Attrs:
@@ -146,6 +165,12 @@ def lint_checkstyle_aspect(binary, config, data = [], rule_kinds = ["java_binary
                 mandatory = True,
                 doc = "Config file",
                 default = config,
+            ),
+            "_configs": attr.label_keyed_string_dict(
+                allow_empty = True,
+                allow_files = True,
+                doc = "Package and configuration files dictionary",
+                default = configs,
             ),
             "_data": attr.label_list(
                 doc = "Additional files to make available to Checkstyle such as any included XML files",

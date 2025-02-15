@@ -79,7 +79,7 @@ fetch_checkstyle()
 <pre>
 load("@aspect_rules_lint//lint:checkstyle.bzl", "lint_checkstyle_aspect")
 
-lint_checkstyle_aspect(<a href="#lint_checkstyle_aspect-binary">binary</a>, <a href="#lint_checkstyle_aspect-config">config</a>, <a href="#lint_checkstyle_aspect-data">data</a>, <a href="#lint_checkstyle_aspect-rule_kinds">rule_kinds</a>)
+lint_checkstyle_aspect(<a href="#lint_checkstyle_aspect-binary">binary</a>, <a href="#lint_checkstyle_aspect-config">config</a>, <a href="#lint_checkstyle_aspect-configs">configs</a>, <a href="#lint_checkstyle_aspect-data">data</a>, <a href="#lint_checkstyle_aspect-rule_kinds">rule_kinds</a>)
 </pre>
 
 A factory function to create a linter aspect.
@@ -105,7 +105,28 @@ Attrs:
 | :------------- | :------------- | :------------- |
 | <a id="lint_checkstyle_aspect-binary"></a>binary |  <p align="center"> - </p>   |  none |
 | <a id="lint_checkstyle_aspect-config"></a>config |  <p align="center"> - </p>   |  none |
+| <a id="lint_checkstyle_aspect-configs"></a>configs |  <p align="center"> - </p>   |  `{}` |
 | <a id="lint_checkstyle_aspect-data"></a>data |  <p align="center"> - </p>   |  `[]` |
 | <a id="lint_checkstyle_aspect-rule_kinds"></a>rule_kinds |  <p align="center"> - </p>   |  `["java_binary", "java_library"]` |
+
+
+<a id="rebuild_map"></a>
+
+## rebuild_map
+
+<pre>
+load("@aspect_rules_lint//lint:checkstyle.bzl", "rebuild_map")
+
+rebuild_map(<a href="#rebuild_map-configs">configs</a>)
+</pre>
+
+
+
+**PARAMETERS**
+
+
+| Name  | Description | Default Value |
+| :------------- | :------------- | :------------- |
+| <a id="rebuild_map-configs"></a>configs |  <p align="center"> - </p>   |  none |
 
 

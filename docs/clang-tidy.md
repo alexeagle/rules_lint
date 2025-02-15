@@ -122,7 +122,7 @@ is_parent_in_list(<a href="#is_parent_in_list-dir">dir</a>, <a href="#is_parent_
 load("@aspect_rules_lint//lint:clang_tidy.bzl", "lint_clang_tidy_aspect")
 
 lint_clang_tidy_aspect(<a href="#lint_clang_tidy_aspect-binary">binary</a>, <a href="#lint_clang_tidy_aspect-configs">configs</a>, <a href="#lint_clang_tidy_aspect-global_config">global_config</a>, <a href="#lint_clang_tidy_aspect-header_filter">header_filter</a>, <a href="#lint_clang_tidy_aspect-lint_target_headers">lint_target_headers</a>,
-                       <a href="#lint_clang_tidy_aspect-angle_includes_are_system">angle_includes_are_system</a>, <a href="#lint_clang_tidy_aspect-verbose">verbose</a>)
+                       <a href="#lint_clang_tidy_aspect-angle_includes_are_system">angle_includes_are_system</a>, <a href="#lint_clang_tidy_aspect-skip_if_no_srcs">skip_if_no_srcs</a>, <a href="#lint_clang_tidy_aspect-verbose">verbose</a>)
 </pre>
 
 A factory function to create a linter aspect.
@@ -138,6 +138,7 @@ A factory function to create a linter aspect.
 | <a id="lint_clang_tidy_aspect-header_filter"></a>header_filter |  optional, set to a posix regex to supply to clang-tidy with the -header-filter option   |  `""` |
 | <a id="lint_clang_tidy_aspect-lint_target_headers"></a>lint_target_headers |  optional, set to True to pass a pattern that includes all headers with the target's directory prefix. This crude control may include headers from the linted target in the results. If supplied, overrides the header_filter option.   |  `False` |
 | <a id="lint_clang_tidy_aspect-angle_includes_are_system"></a>angle_includes_are_system |  controls how angle includes are passed to clang-tidy. By default, Bazel passes these as -isystem. Change this to False to pass these as -I, which allows clang-tidy to regard them as regular header files.   |  `True` |
+| <a id="lint_clang_tidy_aspect-skip_if_no_srcs"></a>skip_if_no_srcs |  optional, set to True to skip target if it provides CcInfo but has no source files. By default this will generate an error.   |  `False` |
 | <a id="lint_clang_tidy_aspect-verbose"></a>verbose |  print debug messages including clang-tidy command lines being invoked.   |  `False` |
 
 

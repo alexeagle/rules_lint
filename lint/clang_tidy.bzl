@@ -177,10 +177,12 @@ def _is_source(file):
     return (file.is_source and file.extension in permitted_source_types)
 
 # modification of filter_srcs in lint_aspect.bzl that filters out header files
-def _filter_srcs(rule):
+def _filter_srcs(rule, skip_if_no_srcs = False):
     if "lint-genfiles" in rule.attr.tags:
         return rule.files.srcs
     else:
+        if skip_if_no_srcs and not hasattr(rule.files, "srcs"):
+            return []
         return [s for s in rule.files.srcs if _is_source(s)]
 
 def is_parent_in_list(dir, list):
@@ -369,7 +371,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     if not CcInfo in target:
         return []
 
-    files_to_lint = _filter_srcs(ctx.rule)
+    files_to_lint = _filter_srcs(ctx.rule, ctx.attr._skip_if_no_srcs)
     compilation_context = target[CcInfo].compilation_context
     if hasattr(ctx.rule.attr, "implementation_deps"):
         compilation_context = cc_common.merge_compilation_contexts(
@@ -394,7 +396,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     clang_tidy_action(ctx, compilation_context, ctx.executable, files_to_lint, outputs.machine.out, outputs.machine.exit_code)
     return [info]
 
-def lint_clang_tidy_aspect(binary, configs = [], global_config = [], header_filter = "", lint_target_headers = False, angle_includes_are_system = True, verbose = False):
+def lint_clang_tidy_aspect(binary, configs = [], global_config = [], header_filter = "", lint_target_headers = False, angle_includes_are_system = True, skip_if_no_srcs = False, verbose = False):
     """A factory function to create a linter aspect.
 
     Args:
@@ -419,6 +421,8 @@ def lint_clang_tidy_aspect(binary, configs = [], global_config = [], header_filt
         angle_includes_are_system: controls how angle includes are passed to clang-tidy. By default, Bazel
             passes these as -isystem. Change this to False to pass these as -I, which allows clang-tidy to regard
             them as regular header files.
+        skip_if_no_srcs: optional, set to True to skip target if it provides CcInfo but has no source files. By
+            default this will generate an error.
         verbose: print debug messages including clang-tidy command lines being invoked.
     """
 
@@ -448,6 +452,9 @@ def lint_clang_tidy_aspect(binary, configs = [], global_config = [], header_filt
             ),
             "_angle_includes_are_system": attr.bool(
                 default = angle_includes_are_system,
+            ),
+            "_skip_if_no_srcs": attr.bool(
+                default = skip_if_no_srcs,
             ),
             "_verbose": attr.bool(
                 default = verbose,

@@ -42,6 +42,9 @@ load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "noop_lint_action", "output_files", "patch_and_output_files")
 
 _MNEMONIC = "AspectRulesLintClangTidy"
+_DISABLED_FEATURES = [
+    "layering_check",
+]
 
 def _gather_inputs(ctx, compilation_context, srcs):
     inputs = srcs + ctx.files._configs
@@ -55,7 +58,7 @@ def _toolchain_env(ctx, user_flags, action_name = ACTION_NAMES.cpp_compile):
         ctx = ctx,
         cc_toolchain = cc_toolchain,
         requested_features = ctx.features,
-        unsupported_features = ctx.disabled_features,
+        unsupported_features = ctx.disabled_features + _DISABLED_FEATURES,
     )
     compile_variables = cc_common.create_compile_variables(
         feature_configuration = feature_configuration,
@@ -76,7 +79,7 @@ def _toolchain_flags(ctx, user_flags, action_name = ACTION_NAMES.cpp_compile):
         ctx = ctx,
         cc_toolchain = cc_toolchain,
         requested_features = ctx.features,
-        unsupported_features = ctx.disabled_features,
+        unsupported_features = ctx.disabled_features + _DISABLED_FEATURES,
     )
     compile_variables = cc_common.create_compile_variables(
         feature_configuration = feature_configuration,

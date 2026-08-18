@@ -8,6 +8,7 @@ common --incompatible_enable_proto_toolchain_resolution
 common --@aspect_rules_ts//ts:skipLibCheck=always
 
 build:lint --aspects=//tools/lint:linters.bzl%eslint
+build:lint --aspects=//tools/lint:linters.bzl%oxlint
 build:lint --aspects=//tools/lint:linters.bzl%stylelint
 build:lint --aspects=//tools/lint:linters.bzl%vale
 

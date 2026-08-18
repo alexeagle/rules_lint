@@ -145,6 +145,15 @@ bzl_library(
 )
 
 bzl_library(
+    name = "oxlint",
+    srcs = ["oxlint.bzl"],
+    deps = [
+        "//lint/private:lint_aspect",
+        "//lint/private:patcher_action",
+    ],
+)
+
+bzl_library(
     name = "buildifier",
     srcs = ["buildifier.bzl"],
     deps = [

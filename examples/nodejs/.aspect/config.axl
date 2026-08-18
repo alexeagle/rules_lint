@@ -5,6 +5,7 @@ def config(ctx: ConfigContext):
     # natively (no Bazel `--config=lint`).
     ctx.tasks["lint"].args.aspects = [
         "//tools/lint:linters.bzl%eslint",
+        "//tools/lint:linters.bzl%oxlint",
         "//tools/lint:linters.bzl%stylelint",
         "//tools/lint:linters.bzl%vale",
     ]

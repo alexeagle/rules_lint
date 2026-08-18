@@ -7,6 +7,7 @@ npm_link_all_packages(name = "node_modules")
 
 exports_files(
     [
+        ".oxlintrc.json",
         ".swcrc",
         ".vale.ini",
     ],

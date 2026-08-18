@@ -9,6 +9,10 @@ load("@npm//:oxlint/package_json.bzl", oxlint_bin = "bin")
 oxlint_bin.oxlint_binary(name = "oxlint")
 ```
 
+The npm distribution is required when your configuration loads
+[JavaScript plugins](https://oxc.rs/docs/guide/usage/linter/js-plugins), including
+custom plugins you write, because they require a JavaScript runtime.
+
 Then declare the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark

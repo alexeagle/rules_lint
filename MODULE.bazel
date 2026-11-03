@@ -22,7 +22,6 @@ bazel_dep(name = "rules_nodejs", version = "6.7.3", repo_name = None)
 # Minimum version needs 'chore: bump bazel-lib to 2.0 by @alexeagle in #1311'
 # to allow users on bazel-lib 2.0
 bazel_dep(name = "aspect_rules_js", version = "1.40.0")
-bazel_dep(name = "aspect_tools_telemetry", version = "0.5.0")
 bazel_dep(name = "bazel_features", version = "1.0.0")
 bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.8.1")
@@ -43,9 +42,6 @@ bazel_dep(name = "rules_python", version = "0.26.0")
 
 # Needed in the root because we dereference the toolchain in our aspect impl
 bazel_dep(name = "rules_buf", version = "0.5.2")
-
-tel = use_extension("@aspect_tools_telemetry//:extension.bzl", "telemetry")
-use_repo(tel, "aspect_tools_telemetry_report")
 
 multitool = use_extension("@rules_multitool//multitool:extension.bzl", "multitool")
 multitool.hub(lockfile = "//format:multitool.lock.json")

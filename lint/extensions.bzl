@@ -1,6 +1,5 @@
 "Module extensions for use with bzlmod"
 
-load("@aspect_tools_telemetry_report//:defs.bzl", "TELEMETRY")  # buildifier: disable=load
 load("@bazel_features//:features.bzl", "bazel_features")
 
 # buildifier: disable=bzl-visibility

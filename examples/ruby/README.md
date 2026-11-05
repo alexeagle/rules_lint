@@ -9,7 +9,12 @@ This example demonstrates how to set up linting for Ruby code using `rules_lint`
 - **RuboCop** - Ruby static code analyzer
 - **Standard Ruby** - Zero-configuration Ruby style guide and linter based on RuboCop
 
-Note: No Ruby formatter is currently available in rules_lint.
+### Formatter
+
+- **Syntax Tree (`stree`)** - Supported through the `ruby` attribute of `format_multirun`.
+  Supply an executable target for `stree`; see [formatting setup](../../docs/formatting.md).
+  Formats `.rb` and `.rake` files with a print width of 100 and the trailing comma plugin by default.
+  Override these defaults with `ruby_check_args` and `ruby_fix_args`.
 
 ## Setup
 

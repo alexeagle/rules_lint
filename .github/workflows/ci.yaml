@@ -14,20 +14,10 @@ concurrency:
 permissions:
   id-token: write
 
-# Points the Aspect CLI at the committed `.aspect/config.json`, which is what
-# tells it cache.aspect.build and bes.aspect.build belong to Aspect Cloud. The
-# CI login records a credential but no endpoints, so nothing else supplies them.
-# Pinned to the checkout root because the example jobs run from subdirectories;
-# it selects only the deployment list, never which `.aspect/config.axl` loads.
-#
-# REMOTE_FLAG is empty on a fork PR, which gets no org secrets: setup-aspect's
-# `aspect auth login --with-api-token` never runs there, so `--remote` would
-# reach Aspect Cloud with no credential.
-env:
-  ASPECT_WORKSPACE: ${{ github.workspace }}
-  REMOTE_FLAG: ${{ secrets.ASPECT_OSS_API_TOKEN != '' && '--remote' || '' }}
-  BAZEL_ASPECT_FLAGS: ${{ secrets.OSS_SAAS_PAT != '' && '--config=aspect-cloud' || '' }}
-
+# Aspect Cloud needs no per-command flag. setup-aspect runs `aspect setup
+# bazelrc`, which writes `~/.aspect/bazelrc` enabling the remote cache and BES
+# for vanilla `bazel`, and `aspect <task>` defaults to `--remote=auto`. Both
+# leave Aspect Cloud off when there is no credential, as on a fork PR.
 jobs:
   list-examples:
     runs-on: ubuntu-latest
@@ -78,20 +68,18 @@ jobs:
             common     --show_progress_rate_limit=60
             common     --show_timestamps
             build:lint --no@rules_lint//lint:color
-            common:aspect-cloud --remote_cache_header=X-Aspect=${{ secrets.OSS_SAAS_PAT }}
-            common:aspect-cloud --bes_header=X-Aspect=${{ secrets.OSS_SAAS_PAT }}
-      # `aspect` must be on PATH: the rc's aspect-cloud section runs
-      # `aspect setup workspace-data` as its workspace status command.
-      - uses: aspect-build/setup-aspect@b1e9d142e86f63c10d603304daa22bf80492e24c # v2026.25.1
+      # `aspect` must be on PATH: the rc's aspect-cloud section uses it as the
+      # credential helper for cache.aspect.build and bes.aspect.build.
+      - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
         with:
-          aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
+          aspect-api-token: ${{ secrets.ASPECT_CLOUD_API_TOKEN }}
       # Permit this gross non-hermetic dependency
       - if: matrix.folder == 'examples/cpp'
         run: sudo apt-get update && sudo apt-get install -y libtinfo5
       # TODO: Fix for Bazel 9
       - if: matrix.folder == 'examples/csharp' || matrix.folder == 'examples/fsharp' || matrix.folder == 'examples/nodejs'
         run: echo "USE_BAZEL_VERSION=8.x" >> "$GITHUB_ENV"
-      - run: bazel run $BAZEL_ASPECT_FLAGS //tools/format
+      - run: bazel run //tools/format
         working-directory: ${{ matrix.folder }}
   # Same examples as `format`, exercised through `aspect format` — the
   # better-DX entry point users actually run. `aspect format` defaults to the
@@ -109,16 +97,16 @@ jobs:
         folder: ${{ fromJson(needs.list-examples.outputs.format-matrix) }}
     steps:
       - uses: actions/checkout@v6
-      - uses: aspect-build/setup-aspect@b1e9d142e86f63c10d603304daa22bf80492e24c # v2026.25.1
+      - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
         with:
-          aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
+          aspect-api-token: ${{ secrets.ASPECT_CLOUD_API_TOKEN }}
       # Permit this gross non-hermetic dependency
       - if: matrix.folder == 'examples/cpp'
         run: sudo apt-get update && sudo apt-get install -y libtinfo5
       # TODO: Fix for Bazel 9
       - if: matrix.folder == 'examples/csharp' || matrix.folder == 'examples/fsharp' || matrix.folder == 'examples/nodejs'
         run: echo "USE_BAZEL_VERSION=8.x" >> "$GITHUB_ENV"
-      - run: aspect format $REMOTE_FLAG --scope=all --severity=warn
+      - run: aspect format --scope=all --severity=warn
         working-directory: ${{ matrix.folder }}
   integration-test:
     needs: list-examples
@@ -138,10 +126,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       # The lint_test.bats in each example shell out to `aspect lint`, so this
-      # job needs the token too — they pick up $REMOTE_FLAG from the job env.
-      - uses: aspect-build/setup-aspect@b1e9d142e86f63c10d603304daa22bf80492e24c # v2026.25.1
+      # job needs the token too.
+      - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
         with:
-          aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
+          aspect-api-token: ${{ secrets.ASPECT_CLOUD_API_TOKEN }}
       - name: Setup bats
         uses: mig4/setup-bats@af9a00deb21b5d795cabfeaa8d9060410377686d # v1
         with:
@@ -171,9 +159,9 @@ jobs:
       - uses: actions/checkout@v6
       - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
         with: *bazelrc
-      - uses: aspect-build/setup-aspect@b1e9d142e86f63c10d603304daa22bf80492e24c # v2026.25.1
+      - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
         with:
-          aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
+          aspect-api-token: ${{ secrets.ASPECT_CLOUD_API_TOKEN }}
       # TODO: Fix for Bazel 9
       - if: matrix.folder == 'examples/cpp' || matrix.folder == 'examples/kotlin' || matrix.folder == 'examples/nodejs'
         run: echo "USE_BAZEL_VERSION=8.x" >> "$GITHUB_ENV"
@@ -181,9 +169,9 @@ jobs:
       - name: Lint
         working-directory: ${{ matrix.folder }}
         run: |
-          bazel build $BAZEL_ASPECT_FLAGS --config=lint --output_groups=rules_lint_human //...
+          bazel build --config=lint --output_groups=rules_lint_human //...
 
-          bazel build $BAZEL_ASPECT_FLAGS --config=lint \
+          bazel build --config=lint \
             --output_groups=rules_lint_patch \
             --@rules_lint//lint:fix \
             //...
@@ -204,9 +192,9 @@ jobs:
         folder: ${{ fromJson(needs.list-examples.outputs.lint-matrix) }}
     steps:
       - uses: actions/checkout@v6
-      - uses: aspect-build/setup-aspect@b1e9d142e86f63c10d603304daa22bf80492e24c # v2026.25.1
+      - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
         with:
-          aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
+          aspect-api-token: ${{ secrets.ASPECT_CLOUD_API_TOKEN }}
       # TODO: Fix for Bazel 9
       - if: matrix.folder == 'examples/cpp' || matrix.folder == 'examples/kotlin' || matrix.folder == 'examples/nodejs'
         run: echo "USE_BAZEL_VERSION=8.x" >> "$GITHUB_ENV"
@@ -217,8 +205,8 @@ jobs:
           folder: ${{ matrix.folder }}
         run: |
           key="lint-${folder//\//-}"
-          aspect lint $REMOTE_FLAG --task:name="$key" --strategy=soft -- //...
-          aspect lint $REMOTE_FLAG --task:name="$key-fix" --fix --strategy=soft -- //...
+          aspect lint --task:name="$key" --strategy=soft -- //...
+          aspect lint --task:name="$key-fix" --fix --strategy=soft -- //...
   # Build & test the root workspace through `aspect test` on Linux across Bazel
   # versions. Complements `test` below, which covers macOS via vanilla Bazel.
   aspect-test:
@@ -237,12 +225,12 @@ jobs:
       USE_BAZEL_VERSION: ${{ matrix.bazel.version }}
     steps:
       - uses: actions/checkout@v6
-      - uses: aspect-build/setup-aspect@b1e9d142e86f63c10d603304daa22bf80492e24c # v2026.25.1
+      - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
         with:
-          aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
+          aspect-api-token: ${{ secrets.ASPECT_CLOUD_API_TOKEN }}
       - name: Test
         working-directory: ${{ matrix.workspace.path }}
-        run: aspect test $REMOTE_FLAG --task:name=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
+        run: aspect test --task:name=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
   test:
     strategy:
       matrix:
@@ -264,14 +252,12 @@ jobs:
           bazelrc: |
             common --announce_rc
             common --color=yes
-            common:aspect-cloud --remote_cache_header=X-Aspect=${{ secrets.OSS_SAAS_PAT }}
-            common:aspect-cloud --bes_header=X-Aspect=${{ secrets.OSS_SAAS_PAT }}
-      - uses: aspect-build/setup-aspect@b1e9d142e86f63c10d603304daa22bf80492e24c # v2026.25.1
+      - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
         with:
-          aspect-api-token: ${{ secrets.ASPECT_OSS_API_TOKEN }}
+          aspect-api-token: ${{ secrets.ASPECT_CLOUD_API_TOKEN }}
       - name: Test
         # Reduce time on macos runners by testing one example
         working-directory: examples/java
         env:
           USE_BAZEL_VERSION: ${{ matrix.version }}
-        run: bazel test $BAZEL_ASPECT_FLAGS //...
+        run: bazel test //...

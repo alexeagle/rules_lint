@@ -13,7 +13,7 @@ EOF
 }
 
 @test "should produce reports" {
-	run aspect lint $REMOTE_FLAG --strategy=soft --tips:silence=add-aspect-api-token-github-actions -- //src/...
+	run aspect lint --strategy=soft --tips:silence=add-aspect-api-token-github-actions -- //src/...
 	assert_success
 	assert_java_lints
 }

@@ -2,7 +2,7 @@ bats_load_library "bats-support"
 bats_load_library "bats-assert"
 
 @test "should produce lint reports with scalafix" {
-	run aspect lint $REMOTE_FLAG --strategy=soft --tips:silence=add-aspect-api-token-github-actions -- //src/...
+	run aspect lint --strategy=soft --tips:silence=add-aspect-api-token-github-actions -- //src/...
 
 	assert_success
 

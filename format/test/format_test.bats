@@ -20,7 +20,7 @@ setup() {
     assert_output --partial "+ prettier --write --log-level=warn examples/nodejs/src/(special_char)/[square]/hello.ts examples/nodejs/src/file-dep.ts examples/nodejs/src/file.ts"
     assert_output --partial "+ prettier --write --log-level=warn examples/nodejs/src/hello.tsx"
     assert_output --partial "+ prettier --write --log-level=warn examples/nodejs/src/hello.vue"
-    assert_output --partial "+ prettier --write --log-level=warn .aspect/config.json .bcr/lint/rust/metadata.template.json .bcr/lint/rust/source.template.json .bcr/lint/scala/metadata.template.json .bcr/lint/scala/source.template.json .bcr/metadata.template.json .bcr/source.template.json"
+    assert_output --partial "+ prettier --write --log-level=warn .bcr/lint/rust/metadata.template.json .bcr/lint/rust/source.template.json .bcr/lint/scala/metadata.template.json .bcr/lint/scala/source.template.json .bcr/metadata.template.json .bcr/source.template.json"
     assert_output --partial "+ prettier --write --log-level=warn examples/nodejs/.swcrc"
     assert_output --partial "+ prettier --write --log-level=warn examples/other_formatters/src/config.json5"
 }

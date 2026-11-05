@@ -1,5 +1,5 @@
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_lint//lint/private:machine_report_testing.bzl", "report_test")  # @unused: used in commented-out tests
+load("@rules_lint//lint/private:machine_report_testing.bzl", "report_test")  # @unused: used in commented-out tests
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_java//java:defs.bzl", "java_library")
 load(

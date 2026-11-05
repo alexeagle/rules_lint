@@ -1,7 +1,7 @@
 "Demonstrates how to enforce zero-lint-tolerance policy with tests"
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_lint//lint/private:machine_report_testing.bzl", "report_test")
+load("@rules_lint//lint/private:machine_report_testing.bzl", "report_test")
 load("//tools/lint:linters.bzl", "ktlint_test")
 load(":machine_output.bzl", "machine_ktlint_report")
 

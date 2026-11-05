@@ -11,10 +11,10 @@ for authoritative documentation about these files.
 This repo hosts several separately versioned modules. Each module's templates
 live under this folder at the same relative path as the module in the repo:
 
-- `.bcr/` — the root `aspect_rules_lint` module, released from `v*` tags
-- `.bcr/lint/rust/` — the `aspect_rules_lint_rust` module (`lint/rust`),
+- `.bcr/` — the root `rules_lint` module, released from `v*` tags
+- `.bcr/lint/rust/` — the `rules_lint_rust` module (`lint/rust`),
   released from `rust-v*` tags
-- `.bcr/lint/scala/` — the `aspect_rules_lint_scala` module (`lint/scala`),
+- `.bcr/lint/scala/` — the `rules_lint_scala` module (`lint/scala`),
   released from `scala-v*` tags
 
 Each release publishes exactly one module: the trigger workflow passes the

@@ -1,17 +1,17 @@
 "Bazel dependencies for Rust lint support"
 
 module(
-    name = "aspect_rules_lint_rules_rust",
+    name = "rules_lint_rules_rust",
     bazel_compatibility = [">=7.6.0"],
 )
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 bazel_dep(name = "aspect_rules_js", version = "1.40.0")
 bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "rules_rust", version = "0.67.0")
 bazel_dep(name = "rules_shell", version = "0.6.1")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )

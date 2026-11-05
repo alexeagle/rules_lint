@@ -6,10 +6,10 @@ Ruff is provided as a built-in tool by rules_lint. To use the built-in version,
 create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:ruff.bzl", "lint_ruff_aspect")
+load("@rules_lint//lint:ruff.bzl", "lint_ruff_aspect")
 
 ruff = lint_ruff_aspect(
-    binary = Label("@aspect_rules_lint//lint:ruff_bin",
+    binary = Label("@rules_lint//lint:ruff_bin",
     configs = [Label("//:.ruff.toml")],
 )
 ```

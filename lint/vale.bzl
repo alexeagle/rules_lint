@@ -49,7 +49,7 @@ See the example in rules_lint for a fully-working vale setup.
 ## Usage
 
 ```starlark
-load("@aspect_rules_lint//lint:vale.bzl", "lint_vale_aspect")
+load("@rules_lint//lint:vale.bzl", "lint_vale_aspect")
 
 vale = lint_vale_aspect(
     binary = Label("//tools/lint:vale"),

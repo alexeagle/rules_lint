@@ -1,7 +1,7 @@
 "Demonstrates how to enforce zero-lint-tolerance policy with tests"
 
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_lint//lint/private:machine_report_testing.bzl", "report_test")  # @unused: used in commented-out tests
+load("@rules_lint//lint/private:machine_report_testing.bzl", "report_test")  # @unused: used in commented-out tests
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_python//python:defs.bzl", "py_library")
 load(

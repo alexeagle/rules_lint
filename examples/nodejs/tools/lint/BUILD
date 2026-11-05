@@ -4,7 +4,7 @@ This is in its own package because it has so many loading-time symbols,
 we don't want to trigger eager fetches of these for builds that don't want to run lint.
 """
 
-load("@aspect_rules_lint//lint:vale_library.bzl", "VALE_STYLES")
+load("@rules_lint//lint:vale_library.bzl", "VALE_STYLES")
 load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 load("@npm//:eslint/package_json.bzl", eslint_bin = "bin")

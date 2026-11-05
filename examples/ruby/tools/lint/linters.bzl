@@ -1,8 +1,8 @@
 "Define Ruby linter aspects"
 
-load("@aspect_rules_lint//lint:lint_test.bzl", "lint_test")
-load("@aspect_rules_lint//lint:rubocop.bzl", "lint_rubocop_aspect")
-load("@aspect_rules_lint//lint:standardrb.bzl", "lint_standardrb_aspect")
+load("@rules_lint//lint:lint_test.bzl", "lint_test")
+load("@rules_lint//lint:rubocop.bzl", "lint_rubocop_aspect")
+load("@rules_lint//lint:standardrb.bzl", "lint_standardrb_aspect")
 
 rubocop = lint_rubocop_aspect(
     binary = Label("//tools/lint:rubocop"),

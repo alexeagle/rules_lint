@@ -1,6 +1,6 @@
 "Bazel dependencies for Node.js formatting and linting example"
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 bazel_dep(name = "aspect_rules_js", version = "2.0.0")
 bazel_dep(name = "aspect_rules_swc", version = "2.0.0")
 bazel_dep(name = "aspect_rules_ts", version = "3.0.0")
@@ -8,7 +8,7 @@ bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 
@@ -26,7 +26,7 @@ rules_ts_ext = use_extension("@aspect_rules_ts//ts:extensions.bzl", "ext")
 rules_ts_ext.deps()
 use_repo(rules_ts_ext, "npm_typescript")
 
-lint_tools = use_extension("@aspect_rules_lint//lint:extensions.bzl", "tools")
+lint_tools = use_extension("@rules_lint//lint:extensions.bzl", "tools")
 lint_tools.vale()
 lint_tools.vale_styles(
     styles = [

@@ -1,4 +1,4 @@
-# Cut a release of the main aspect_rules_lint module whenever a new v* tag is pushed.
+# Cut a release of the main rules_lint module whenever a new v* tag is pushed.
 name: Release
 
 on:
@@ -57,7 +57,7 @@ jobs:
       tag_name: ${{ inputs.tag_name || github.ref_name }}
       tag_prefix: "v"
       module_root: "."
-      module_name: "aspect_rules_lint"
+      module_name: "rules_lint"
       release_files: |
         go-binaries/*
         rules_lint-*.tar.gz

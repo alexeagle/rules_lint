@@ -1,4 +1,4 @@
-load("@aspect_rules_lint//format:defs.bzl", "format_test")
+load("@rules_lint//format:defs.bzl", "format_test")
 load("@rules_shell//shell:sh_library.bzl", "sh_library")
 
 package(default_visibility = ["//visibility:public"])

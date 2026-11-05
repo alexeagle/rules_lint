@@ -9,4 +9,4 @@ tasks:
     platform: ${{ platform }}
     bazel: ${{ bazel }}
     build_targets:
-      - "@aspect_rules_lint_scala//:all"
+      - "@rules_lint_scala//:all"

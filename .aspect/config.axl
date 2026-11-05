@@ -52,6 +52,9 @@ def config(ctx: ConfigContext):
     ctx.features[ArtifactUpload].args.upload_profile = True
     ctx.features[ArtifactUpload].args.upload_bep = True
 
+    # This repo's module is rules_lint, not aspect_rules_lint (the task's default).
+    ctx.tasks["lint"].args.rules_lint_fix_flag = "@rules_lint//lint:fix"
+
     # Fork PRs lack ASPECT_API_TOKEN and a usable OIDC token, so disable
     # the features that depend on them (and silence the tips they would
     # otherwise emit). The build/test itself is unaffected.

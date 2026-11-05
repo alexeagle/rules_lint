@@ -1,4 +1,4 @@
-load("@aspect_rules_lint//format:defs.bzl", "format_multirun")
+load("@rules_lint//format:defs.bzl", "format_multirun")
 load("@bazel_lib//lib:expand_template.bzl", "expand_template")
 
 package(default_visibility = ["//:__subpackages__"])

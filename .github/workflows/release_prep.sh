@@ -65,7 +65,7 @@ emit_changelog() {
 	fi
 }
 
-# ---- Sub-module releases (aspect_rules_lint_rust, ...) --------------------
+# ---- Sub-module releases (rules_lint_rust, ...) --------------------
 # These archives are just the module's subtree hoisted to the archive root,
 # with the module version patched in. Add a module by adding a
 # "<tag-prefix>*) <module root>" case below (plus a trigger workflow and its
@@ -102,7 +102,7 @@ if [[ -n "$SRC_MODULE_ROOT" ]]; then
 
 	# Patch MODULE.bazel: stamp the release version (0.0.0 -> real) and drop
 	# the dev-only local_path_override block (consumers resolve
-	# aspect_rules_lint from the registry).
+	# rules_lint from the registry).
 	git show "${TAG}:${SRC_MODULE_ROOT}/MODULE.bazel" |
 		sed -e "s/^    version = \"0\.0\.0\"/    version = \"${MODULE_VERSION}\"/" \
 			-e '/^local_path_override($/,/^)$/d' |
@@ -130,7 +130,7 @@ EOF
 	exit 0
 fi
 
-# ---- Root module release (aspect_rules_lint) -------------------------------
+# ---- Root module release (rules_lint) -------------------------------
 # The prefix is chosen to match what GitHub generates for source archives
 PREFIX="rules_lint-${TAG:1}"
 ARCHIVE="rules_lint-$TAG.tar.gz"
@@ -216,7 +216,7 @@ cat << EOF
 Add this to your `MODULE.bazel` file:
 
 \`\`\`starlark
-bazel_dep(name = "aspect_rules_lint", version = "${TAG:1}")
+bazel_dep(name = "rules_lint", version = "${TAG:1}")
 \`\`\`
 
 This repo also provides a \`lint\` task for the [Aspect CLI].
@@ -225,7 +225,7 @@ Add this to your \`MODULE.aspect\` file:
 \`\`\`starlark
 # AXL dependencies; see https://github.com/aspect-extensions
 axl_archive_dep(
-    name = "aspect_rules_lint",
+    name = "rules_lint",
     urls = ["https://github.com/aspect-build/rules_lint/releases/download/${TAG}/rules_lint-${TAG}.tar.gz"],
     integrity = "${INTEGRITY}",
     strip_prefix = "rules_lint-${TAG:1}",

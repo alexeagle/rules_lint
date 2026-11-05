@@ -1,11 +1,11 @@
 "Bazel dependencies for keep-sorted lint example"
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 bazel_dep(name = "rules_go", version = "0.52.0")
 bazel_dep(name = "gazelle", version = "0.41.0")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 
@@ -20,5 +20,5 @@ use_repo(go_sdk, "go_sdk")
 # Fetch keep-sorted dependency via gazelle
 # Note: requires --experimental_isolated_extension_usages in .bazelrc
 keep_sorted_deps = use_extension("@gazelle//:extensions.bzl", "go_deps", isolate = True)
-keep_sorted_deps.from_file(go_mod = "@aspect_rules_lint//lint/keep-sorted:go.mod")
+keep_sorted_deps.from_file(go_mod = "@rules_lint//lint/keep-sorted:go.mod")
 use_repo(keep_sorted_deps, "com_github_google_keep_sorted")

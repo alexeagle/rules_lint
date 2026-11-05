@@ -28,7 +28,7 @@ native_binary(
 Finally, create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:clang_tidy.bzl", "lint_clang_tidy_aspect")
+load("@rules_lint//lint:clang_tidy.bzl", "lint_clang_tidy_aspect")
 
 clang_tidy = lint_clang_tidy_aspect(
     binary = Label("//path/to:clang-tidy"),
@@ -510,7 +510,7 @@ def lint_clang_tidy_aspect(
                 cfg = "exec",
             ),
             "_clang_tidy_wrapper": attr.label(
-                default = Label("@aspect_rules_lint//lint:clang_tidy_wrapper"),
+                default = Label("@rules_lint//lint:clang_tidy_wrapper"),
                 executable = True,
                 cfg = "exec",
             ),

@@ -1,7 +1,7 @@
 "Shared starlark helpers for executing the patcher.mjs script"
 patcher_attrs = {
     "_patcher": attr.label(
-        default = "@aspect_rules_lint//lint/private:patcher",
+        default = "@rules_lint//lint/private:patcher",
         executable = True,
         cfg = "exec",
     ),

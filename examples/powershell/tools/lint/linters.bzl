@@ -1,7 +1,7 @@
 """PSScriptAnalyzer linter aspect for the PowerShell example workspace."""
 
-load("@aspect_rules_lint//lint:lint_test.bzl", "lint_test")
-load("@aspect_rules_lint//lint:ps_script_analyzer.bzl", "lint_ps_script_analyzer_aspect")
+load("@rules_lint//lint:lint_test.bzl", "lint_test")
+load("@rules_lint//lint:ps_script_analyzer.bzl", "lint_ps_script_analyzer_aspect")
 
 ps_script_analyzer = lint_ps_script_analyzer_aspect(
     binary = Label("@pwsh//:pwsh"),

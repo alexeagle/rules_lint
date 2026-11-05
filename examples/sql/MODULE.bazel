@@ -1,10 +1,10 @@
 "Bazel dependencies for SQL formatting example"
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 bazel_dep(name = "aspect_rules_js", version = "2.0.0")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 

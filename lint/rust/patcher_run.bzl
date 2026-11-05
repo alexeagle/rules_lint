@@ -1,7 +1,7 @@
-load("@aspect_rules_lint//lint/private:patcher_action.bzl", "patcher_attrs", _run_patcher = "run_patcher")
+load("@rules_lint//lint/private:patcher_action.bzl", "patcher_attrs", _run_patcher = "run_patcher")
 load("@bazel_lib//lib:expand_make_vars.bzl", _expand_locations = "expand_locations")
 
-# TODO: Remove this file after aspect_rules_lint includes this patcher_run fix and lint/rust/MODULE.bazel requires that release.
+# TODO: Remove this file after rules_lint includes this patcher_run fix and lint/rust/MODULE.bazel requires that release.
 
 def _repository_relative_path(file):
     if not file.short_path.startswith("../"):

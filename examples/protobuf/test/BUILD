@@ -1,5 +1,5 @@
 # buildifier: disable=bzl-visibility
-load("@aspect_rules_lint//lint/private:machine_report_testing.bzl", "report_test")
+load("@rules_lint//lint/private:machine_report_testing.bzl", "report_test")
 load("//test:machine_output.bzl", "machine_buf_report")
 load("//tools/lint:linters.bzl", "buf_test")
 

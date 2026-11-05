@@ -22,7 +22,7 @@ py_console_script_binary(
 Finally, create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:bandit.bzl", "lint_bandit_aspect")
+load("@rules_lint//lint:bandit.bzl", "lint_bandit_aspect")
 
 bandit = lint_bandit_aspect(
     binary = Label("//tools/lint:bandit"),  # requires [sarif] extra

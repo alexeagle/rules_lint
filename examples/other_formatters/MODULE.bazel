@@ -1,12 +1,12 @@
 "Bazel dependencies for other formatters example"
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 bazel_dep(name = "aspect_rules_js", version = "2.0.0")
 bazel_dep(name = "rules_python", version = "0.26.0")
 bazel_dep(name = "buildifier_prebuilt", version = "6.3.3")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 

@@ -45,7 +45,7 @@ def _format_attr_factory(target_name, lang, toolname, tool_label, mode, disable_
         "name": target_name + (".check" if mode in "check" else ""),
         ("env" if mode == "test" else "environment"): {
             # NB: can't use str(Label(target_name)) here because bzlmod makes it
-            # the apparent repository, starts with @@aspect_rules_lint~override
+            # the apparent repository, starts with @@rules_lint~override
             "FIX_TARGET": fix_target_label or "//{}:{}".format(native.package_name(), target_name),
             "tool": "$(rlocationpaths %s)" % tool_label,
             "lang": lang,
@@ -76,7 +76,7 @@ Some languages have dialects:
         to_attribute_name(key): attr.label(
             doc = "a `{0}` binary, or any other tool that has a matching command-line interface. {1}".format(
                 value,
-                "Use `@aspect_rules_lint//format:{}` to choose the built-in tool.".format(BUILTIN_TOOL_LABELS[key].split("/")[-1]) if key in BUILTIN_TOOL_LABELS.keys() else "",
+                "Use `@rules_lint//format:{}` to choose the built-in tool.".format(BUILTIN_TOOL_LABELS[key].split("/")[-1]) if key in BUILTIN_TOOL_LABELS.keys() else "",
             ),
         )
         for key, value in TOOLS.items()
@@ -114,7 +114,7 @@ def format_multirun(name, jobs = 4, print_command = False, disable_git_attribute
     for lang, toolname, tool_label, target_name, custom_args in _tools_loop(name, kwargs):
         for mode in ["check", "fix"]:
             command(
-                command = Label("@aspect_rules_lint//format/private:format"),
+                command = Label("@rules_lint//format/private:format"),
                 description = "Formatting {} with {}...".format(lang, toolname),
                 tags = common_attrs.get("tags", []),
                 **_format_attr_factory(target_name, lang, toolname, tool_label, mode, disable_git_attribute_checks, custom_args)
@@ -202,7 +202,7 @@ def format_test(name, srcs = None, workspace = None, no_sandbox = False, disable
             attrs["env"]["WORKSPACE"] = "$(location {})".format(workspace)
 
         sh_test(
-            srcs = [Label("@aspect_rules_lint//format/private:format.sh")],
+            srcs = [Label("@rules_lint//format/private:format.sh")],
             deps = [Label("@bazel_tools//tools/bash/runfiles")],
             tags = unique(tags + (["no-sandbox", "no-cache", "external"] if workspace else [])),
             **(common_attrs | attrs)

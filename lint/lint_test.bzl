@@ -9,8 +9,8 @@ To use this, in your `linters.bzl` where you define the aspect, just create a te
 For example, with `flake8`:
 
 ```starlark
-load("@aspect_rules_lint//lint:lint_test.bzl", "lint_test")
-load("@aspect_rules_lint//lint:flake8.bzl", "lint_flake8_aspect")
+load("@rules_lint//lint:lint_test.bzl", "lint_test")
+load("@rules_lint//lint:flake8.bzl", "lint_flake8_aspect")
 
 flake8 = lint_flake8_aspect(
     binary = Label("//:flake8"),

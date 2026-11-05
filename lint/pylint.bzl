@@ -18,7 +18,7 @@ py_console_script_binary(
 Finally, create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:pylint.bzl", "lint_pylint_aspect")
+load("@rules_lint//lint:pylint.bzl", "lint_pylint_aspect")
 
 pylint = lint_pylint_aspect(
     binary = Label("//tools/lint:pylint"),

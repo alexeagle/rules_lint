@@ -6,3 +6,4 @@ def config(ctx: ConfigContext):
     ctx.tasks["lint"].args.aspects = [
         "//tools/lint:linters.bzl%ps_script_analyzer",
     ]
+    ctx.tasks["lint"].args.rules_lint_fix_flag = "@rules_lint//lint:fix"

@@ -1,15 +1,15 @@
 "Bazel dependencies for Scala lint support"
 
 module(
-    name = "aspect_rules_lint_scala",
+    name = "rules_lint_scala",
     version = "0.0.0",
 )
 
-bazel_dep(name = "aspect_rules_lint", version = "2.7.2")
+bazel_dep(name = "rules_lint", version = "2.7.2")
 bazel_dep(name = "rules_java", version = "7.0.6")
 bazel_dep(name = "rules_scala", version = "7.1.6")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )

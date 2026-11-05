@@ -18,7 +18,7 @@ java_binary(
 Finally, declare an aspect for it, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:checkstyle.bzl", "lint_checkstyle_aspect")
+load("@rules_lint//lint:checkstyle.bzl", "lint_checkstyle_aspect")
 
 checkstyle = lint_checkstyle_aspect(
     binary = Label("//tools/lint:checkstyle"),

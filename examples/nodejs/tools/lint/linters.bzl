@@ -1,9 +1,9 @@
 "Define Node.js linter aspects"
 
-load("@aspect_rules_lint//lint:eslint.bzl", "lint_eslint_aspect")
-load("@aspect_rules_lint//lint:lint_test.bzl", "lint_test")
-load("@aspect_rules_lint//lint:stylelint.bzl", "lint_stylelint_aspect")
-load("@aspect_rules_lint//lint:vale.bzl", "lint_vale_aspect")
+load("@rules_lint//lint:eslint.bzl", "lint_eslint_aspect")
+load("@rules_lint//lint:lint_test.bzl", "lint_test")
+load("@rules_lint//lint:stylelint.bzl", "lint_stylelint_aspect")
+load("@rules_lint//lint:vale.bzl", "lint_vale_aspect")
 
 eslint = lint_eslint_aspect(
     binary = Label("//tools/lint:eslint"),

@@ -1,5 +1,5 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_library", "js_run_binary", "js_test")
-load("@aspect_rules_lint//lint/private:patcher_run.bzl", "patcher_run")
+load("@rules_lint//lint/private:patcher_run.bzl", "patcher_run")
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 

@@ -3,7 +3,7 @@
 Typical usage:
 
 ```
-load("@aspect_rules_lint//lint:buf.bzl", "lint_buf_aspect")
+load("@rules_lint//lint:buf.bzl", "lint_buf_aspect")
 
 buf = lint_buf_aspect(
     config = Label("//path/to:buf.yaml"),

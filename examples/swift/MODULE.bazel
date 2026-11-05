@@ -1,12 +1,12 @@
 "Bazel dependencies for Swift formatting example"
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 
 # Swift formatter tools
-format_tools = use_extension("@aspect_rules_lint//format:extensions.bzl", "tools")
+format_tools = use_extension("@rules_lint//format:extensions.bzl", "tools")
 format_tools.swiftformat()
 use_repo(format_tools, "swiftformat", "swiftformat_mac")

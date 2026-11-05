@@ -1,22 +1,22 @@
 "Bazel dependencies for Java formatting and linting example"
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 bazel_dep(name = "rules_java", version = "8.5.0")
 bazel_dep(name = "rules_jvm_external", version = "6.5")
 bazel_dep(name = "bazel_skylib", version = "1.4.2")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 
 # Java formatter tools
-format_tools = use_extension("@aspect_rules_lint//format:extensions.bzl", "tools")
+format_tools = use_extension("@rules_lint//format:extensions.bzl", "tools")
 format_tools.google_java_format()
 use_repo(format_tools, "google-java-format")
 
 # Java linter tools
-lint_tools = use_extension("@aspect_rules_lint//lint:extensions.bzl", "tools")
+lint_tools = use_extension("@rules_lint//lint:extensions.bzl", "tools")
 lint_tools.checkstyle()
 lint_tools.spotbugs()
 lint_tools.pmd()

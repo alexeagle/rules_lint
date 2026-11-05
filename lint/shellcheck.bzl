@@ -6,10 +6,10 @@ Shellcheck is provided as a built-in tool by rules_lint. To use the built-in ver
 create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:shellcheck.bzl", "lint_shellcheck_aspect")
+load("@rules_lint//lint:shellcheck.bzl", "lint_shellcheck_aspect")
 
 shellcheck = lint_shellcheck_aspect(
-    binary = Label("@aspect_rules_lint//lint:shellcheck_bin",
+    binary = Label("@rules_lint//lint:shellcheck_bin",
     config = Label("//:.shellcheckrc"),
 )
 ```

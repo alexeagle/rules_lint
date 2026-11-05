@@ -41,7 +41,7 @@ alias(
 
 5. Create the linter aspect, typically in `tools/lint/linters.bzl`:
 ```starlark
-load("@aspect_rules_lint//lint:rubocop.bzl", "lint_rubocop_aspect")
+load("@rules_lint//lint:rubocop.bzl", "lint_rubocop_aspect")
 
 rubocop = lint_rubocop_aspect(
     binary = "//tools/lint:rubocop",

@@ -1,6 +1,6 @@
 # Reusable per-module BCR release, copied from aspect-build/aspect-gazelle.
 # Called by thin per-module trigger workflows (release.yml for the root
-# aspect_rules_lint module, release-rust.yml for aspect_rules_lint_rust) that
+# rules_lint module, release-rust.yml for rules_lint_rust) that
 # supply the tag prefix, module root, module name, and optionally the release
 # assets to upload. Builds the module's archive via release_prep.sh (which
 # branches on the tag prefix) and drives the publish-to-bcr reusable workflow,
@@ -23,7 +23,7 @@ on:
         required: true
         type: string
       module_name:
-        description: 'Bzlmod module name, e.g. "aspect_rules_lint_rust".'
+        description: 'Bzlmod module name, e.g. "rules_lint_rust".'
         required: true
         type: string
       release_files:

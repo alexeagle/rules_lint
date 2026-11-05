@@ -9,5 +9,5 @@ tasks:
     platform: ${{ platform }}
     bazel: ${{ bazel }}
     build_targets:
-      - "@aspect_rules_lint//lint:all"
-      - "@aspect_rules_lint//format:all"
+      - "@rules_lint//lint:all"
+      - "@rules_lint//format:all"

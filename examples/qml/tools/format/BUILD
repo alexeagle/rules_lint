@@ -1,4 +1,4 @@
-load("@aspect_rules_lint//format:defs.bzl", "format_multirun")
+load("@rules_lint//format:defs.bzl", "format_multirun")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 package(default_visibility = ["//:__subpackages__"])

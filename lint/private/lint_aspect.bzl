@@ -216,7 +216,7 @@ def noop_lint_action(ctx, outputs):
         command = " && ".join(commands),
     )
 
-SARIF_PARSER_TOOLCHAIN = Label("@aspect_rules_lint//tools/toolchains:sarif_parser_toolchain_type")
+SARIF_PARSER_TOOLCHAIN = Label("@rules_lint//tools/toolchains:sarif_parser_toolchain_type")
 OPTIONAL_SARIF_PARSER_TOOLCHAIN = config_common.toolchain_type(SARIF_PARSER_TOOLCHAIN, mandatory = False)
 
 def parse_to_sarif_action(ctx, mnemonic, raw_machine_report, sarif_out):

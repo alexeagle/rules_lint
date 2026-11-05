@@ -1,12 +1,12 @@
 "Define Python linter aspects"
 
-load("@aspect_rules_lint//lint:bandit.bzl", "lint_bandit_aspect")
-load("@aspect_rules_lint//lint:flake8.bzl", "lint_flake8_aspect")
-load("@aspect_rules_lint//lint:lint_test.bzl", "lint_test")
-load("@aspect_rules_lint//lint:pydoclint.bzl", "lint_pydoclint_aspect")
-load("@aspect_rules_lint//lint:pylint.bzl", "lint_pylint_aspect")
-load("@aspect_rules_lint//lint:ruff.bzl", "lint_ruff_aspect")
-load("@aspect_rules_lint//lint:ty.bzl", "lint_ty_aspect")
+load("@rules_lint//lint:bandit.bzl", "lint_bandit_aspect")
+load("@rules_lint//lint:flake8.bzl", "lint_flake8_aspect")
+load("@rules_lint//lint:lint_test.bzl", "lint_test")
+load("@rules_lint//lint:pydoclint.bzl", "lint_pydoclint_aspect")
+load("@rules_lint//lint:pylint.bzl", "lint_pylint_aspect")
+load("@rules_lint//lint:ruff.bzl", "lint_ruff_aspect")
+load("@rules_lint//lint:ty.bzl", "lint_ty_aspect")
 
 bandit = lint_bandit_aspect(
     binary = Label("//tools/lint:bandit"),
@@ -37,7 +37,7 @@ pydoclint = lint_pydoclint_aspect(
 pydoclint_test = lint_test(aspect = pydoclint)
 
 ruff = lint_ruff_aspect(
-    binary = Label("@aspect_rules_lint//lint:ruff_bin"),
+    binary = Label("@rules_lint//lint:ruff_bin"),
     configs = [
         Label("@//:pyproject.toml"),
         Label("@//src:ruff.toml"),
@@ -48,7 +48,7 @@ ruff = lint_ruff_aspect(
 ruff_test = lint_test(aspect = ruff)
 
 ty = lint_ty_aspect(
-    binary = Label("@aspect_rules_lint//lint:ty_bin"),
+    binary = Label("@rules_lint//lint:ty_bin"),
     config = Label("@//:pyproject.toml"),
 )
 

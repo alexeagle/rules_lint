@@ -202,7 +202,7 @@ def lint_cppcheck_aspect(binary, verbose = False, rule_kinds = DEFAULT_RULE_KIND
                 cfg = "exec",
             ),
             "_cppcheck_wrapper": attr.label(
-                default = Label("@aspect_rules_lint//lint:cppcheck_wrapper"),
+                default = Label("@rules_lint//lint:cppcheck_wrapper"),
                 executable = True,
                 cfg = "exec",
             ),

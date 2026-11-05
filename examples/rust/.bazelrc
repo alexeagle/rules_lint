@@ -5,7 +5,7 @@ try-import %workspace%/../../.aspect/bazelrc
 
 build:lint --aspects=//tools/lint:linters.bzl%clippy
 
-test --@aspect_rules_lint//lint:fail_on_violation
+test --@rules_lint//lint:fail_on_violation
 
 common --enable_platform_specific_config
 common:linux --@llvm//config:experimental_stub_libgcc_s=True

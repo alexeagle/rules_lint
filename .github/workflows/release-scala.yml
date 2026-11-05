@@ -1,4 +1,4 @@
-# Release + publish aspect_rules_lint_scala to the BCR, independently of the
+# Release + publish rules_lint_scala to the BCR, independently of the
 # root module (own scala-v* version line). Thin trigger over release-module.yaml;
 # to add another module (e.g. lint/scala), copy this file with a new tag
 # prefix / root / name (and add a release_prep.sh case + .bcr/<module>/ templates).
@@ -28,7 +28,7 @@ jobs:
       tag_name: ${{ inputs.tag_name || github.ref_name }}
       tag_prefix: "scala-v"
       module_root: "lint/scala"
-      module_name: "aspect_rules_lint_scala"
+      module_name: "rules_lint_scala"
       # The root workspace's tests don't cover this nested module (it is its
       # own Bazel workspace, tested by repo CI), so skip the test run.
       bazel_test_command: "true"

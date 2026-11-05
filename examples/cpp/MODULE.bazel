@@ -1,6 +1,6 @@
 "Bazel dependencies for C++ formatting and linting example"
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 bazel_dep(name = "rules_cc", version = "0.2.8")
 bazel_dep(name = "rules_shell", version = "0.6.1")
 bazel_dep(name = "toolchains_llvm", version = "1.1.2")
@@ -8,7 +8,7 @@ bazel_dep(name = "bazel_skylib", version = "1.8.2")
 bazel_dep(name = "platforms", version = "1.0.0")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 
@@ -23,7 +23,7 @@ llvm.toolchain(
 use_repo(llvm, "llvm_toolchain", "llvm_toolchain_llvm")
 
 # C++ linter tools
-lint_tools = use_extension("@aspect_rules_lint//lint:extensions.bzl", "tools")
+lint_tools = use_extension("@rules_lint//lint:extensions.bzl", "tools")
 lint_tools.cppcheck()
 use_repo(
     lint_tools,

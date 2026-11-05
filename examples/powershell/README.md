@@ -1,7 +1,7 @@
 # PowerShell Linting with PSScriptAnalyzer
 
 This example demonstrates running [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)
-as a Bazel lint aspect via `aspect_rules_lint`.
+as a Bazel lint aspect via `rules_lint`.
 
 ## Prerequisites
 
@@ -54,5 +54,5 @@ filegroup(
 ```bash
 bazel build --config=lint --output_groups=rules_lint_human //src:all
 bazel build --config=lint --output_groups=rules_lint_machine //src:all
-bazel build --config=lint --@aspect_rules_lint//lint:fail_on_violation //src:all
+bazel build --config=lint --@rules_lint//lint:fail_on_violation //src:all
 ```

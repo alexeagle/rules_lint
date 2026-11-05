@@ -1,20 +1,20 @@
 "Bazel dependencies for Kotlin formatting and linting example"
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 bazel_dep(name = "rules_kotlin", version = "1.9.0")
 bazel_dep(name = "rules_java", version = "8.5.0")
 bazel_dep(name = "bazel_skylib", version = "1.4.2")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 
-format_tools = use_extension("@aspect_rules_lint//format:extensions.bzl", "tools")
+format_tools = use_extension("@rules_lint//format:extensions.bzl", "tools")
 format_tools.ktfmt()
 use_repo(format_tools, "ktfmt")
 
-lint_tools = use_extension("@aspect_rules_lint//lint:extensions.bzl", "tools")
+lint_tools = use_extension("@rules_lint//lint:extensions.bzl", "tools")
 lint_tools.ktlint()
 use_repo(
     lint_tools,

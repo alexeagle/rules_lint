@@ -1,4 +1,4 @@
-load("@aspect_rules_lint//format:defs.bzl", "format_test")
+load("@rules_lint//format:defs.bzl", "format_test")
 load("@aspect_rules_swc//swc:defs.bzl", "swc")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
 load("@bazel_skylib//lib:partial.bzl", "partial")

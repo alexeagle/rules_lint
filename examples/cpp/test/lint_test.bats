@@ -17,7 +17,7 @@ function assert_cpp_lints() {
 # Regression for https://github.com/aspect-build/rules_lint/issues/899: clang-tidy's
 # summary lines (warnings generated / Suppressed / Use -header-filter / treated as
 # error) must be stripped while real diagnostics are kept, else a clean run trips
-# --@aspect_rules_lint//lint:fail_on_violation.
+# --@rules_lint//lint:fail_on_violation.
 @test "clang-tidy report excludes summary statistics" {
 	bazel build --aspects=//tools/lint:linters.bzl%clang_tidy --output_groups=rules_lint_human //src:hello_cc
 	report=$(find -L "$(bazel info bazel-bin)/src" -name '*hello*ClangTidy*.out' | head -n 1)

@@ -7,3 +7,4 @@ def config(ctx: ConfigContext):
         "//tools/lint:linters.bzl%clang_tidy",
         "//tools/lint:linters.bzl%cppcheck",
     ]
+    ctx.tasks["lint"].args.rules_lint_fix_flag = "@rules_lint//lint:fix"

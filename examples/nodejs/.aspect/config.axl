@@ -8,3 +8,4 @@ def config(ctx: ConfigContext):
         "//tools/lint:linters.bzl%stylelint",
         "//tools/lint:linters.bzl%vale",
     ]
+    ctx.tasks["lint"].args.rules_lint_fix_flag = "@rules_lint//lint:fix"

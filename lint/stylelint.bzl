@@ -27,7 +27,7 @@ stylelint_bin.stylelint_binary(name = "stylelint")
 Then declare the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:stylelint.bzl", "lint_stylelint_aspect")
+load("@rules_lint//lint:stylelint.bzl", "lint_stylelint_aspect")
 stylelint = lint_stylelint_aspect(
     binary = Label("//tools/lint:stylelint"),
     config = Label("//:stylelintrc"),
@@ -231,7 +231,7 @@ def lint_stylelint_aspect(binary, config, rule_kinds = ["css_library"], filegrou
                 allow_files = True,
             ),
             "_compact_formatter": attr.label(
-                default = "@aspect_rules_lint//lint/js:stylelint.compact-formatter",
+                default = "@rules_lint//lint/js:stylelint.compact-formatter",
                 allow_single_file = True,
                 cfg = "exec",
             ),

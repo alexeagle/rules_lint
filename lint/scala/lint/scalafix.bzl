@@ -41,7 +41,7 @@ java_binary(
 Finally, create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint_scala//lint:scalafix.bzl", "lint_scalafix_aspect")
+load("@rules_lint_scala//lint:scalafix.bzl", "lint_scalafix_aspect")
 
 scalafix = lint_scalafix_aspect(
     binary = Label("//tools/lint:scalafix"),
@@ -84,8 +84,8 @@ Note: rewrite-only rules emit diffs. The SARIF output uses a generic warning at 
 hunk start line, which is sufficient for CI but less detailed than the human report.
 """
 
-load("@aspect_rules_lint//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "filter_srcs", "noop_lint_action", "output_files", "parse_to_sarif_action", "patch_and_output_files", "should_visit")
-load("@aspect_rules_lint//lint/private:patcher_action.bzl", "patcher_attrs", "run_patcher")
+load("@rules_lint//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "filter_srcs", "noop_lint_action", "output_files", "parse_to_sarif_action", "patch_and_output_files", "should_visit")
+load("@rules_lint//lint/private:patcher_action.bzl", "patcher_attrs", "run_patcher")
 load("@rules_java//java:defs.bzl", "JavaInfo")
 load("@rules_scala//scala:semanticdb_provider.bzl", "SemanticdbInfo")
 
@@ -247,7 +247,7 @@ def lint_scalafix_aspect(binary, config, rule_kinds = ["scala_library", "scala_b
         implementation = _scalafix_aspect_impl,
         attrs = patcher_attrs | {
             "_options": attr.label(
-                default = "@aspect_rules_lint//lint:options",
+                default = "@rules_lint//lint:options",
                 providers = [LintOptionsInfo],
             ),
             "_scalafix": attr.label(

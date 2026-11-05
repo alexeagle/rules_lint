@@ -11,7 +11,7 @@ bazel_dep(name = "buildifier_prebuilt", version = "8.5.1")
 Then create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:buildifier.bzl", "lint_buildifier_aspect")
+load("@rules_lint//lint:buildifier.bzl", "lint_buildifier_aspect")
 
 buildifier = lint_buildifier_aspect(
     binary = Label("@buildifier_prebuilt//:buildifier"),

@@ -14,7 +14,7 @@ eslint_bin.eslint_binary(name = "eslint")
 Finally, create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:eslint.bzl", "lint_eslint_aspect")
+load("@rules_lint//lint:eslint.bzl", "lint_eslint_aspect")
 
 eslint = lint_eslint_aspect(
     binary = Label("//tools/lint:eslint"),
@@ -264,17 +264,17 @@ def lint_eslint_aspect(binary, configs, rule_kinds = ["js_library", "ts_project"
                 allow_files = True,
             ),
             "_workaround_17660": attr.label(
-                default = "@aspect_rules_lint//lint/js:eslint.workaround_17660",
+                default = "@rules_lint//lint/js:eslint.workaround_17660",
                 allow_single_file = True,
                 cfg = "exec",
             ),
             "_compact_formatter": attr.label(
-                default = "@aspect_rules_lint//lint/js:eslint.compact-formatter",
+                default = "@rules_lint//lint/js:eslint.compact-formatter",
                 allow_single_file = True,
                 cfg = "exec",
             ),
             "_stylish_formatter": attr.label(
-                default = "@aspect_rules_lint//lint/js:eslint.stylish-formatter",
+                default = "@rules_lint//lint/js:eslint.stylish-formatter",
                 allow_single_file = True,
                 cfg = "exec",
             ),

@@ -20,7 +20,7 @@ java_binary(
 Finally, declare an aspect for it, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:spotbugs.bzl", "lint_spotbugs_aspect")
+load("@rules_lint//lint:spotbugs.bzl", "lint_spotbugs_aspect")
 
 spotbugs = lint_spotbugs_aspect(
     binary = Label("//tools/lint:spotbugs"),

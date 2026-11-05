@@ -10,13 +10,13 @@ To keep it isolated from your other go dependencies, we recommend adding to .baz
 Next add to MODULE.bazel:
 
     keep_sorted_deps = use_extension("@gazelle//:extensions.bzl", "go_deps", isolate = True)
-    keep_sorted_deps.from_file(go_mod = "@aspect_rules_lint//lint/keep-sorted:go.mod")
+    keep_sorted_deps.from_file(go_mod = "@rules_lint//lint/keep-sorted:go.mod")
     use_repo(keep_sorted_deps, "com_github_google_keep_sorted")
 
 Finally, create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:keep_sorted.bzl", "lint_keep_sorted_aspect")
+load("@rules_lint//lint:keep_sorted.bzl", "lint_keep_sorted_aspect")
 
 keep_sorted = lint_keep_sorted_aspect(
     binary = Label("@com_github_google_keep_sorted//:keep-sorted"),

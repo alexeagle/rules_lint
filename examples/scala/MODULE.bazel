@@ -1,19 +1,19 @@
 "Bazel dependencies for Scala formatting example"
 
-bazel_dep(name = "aspect_rules_lint")
-bazel_dep(name = "aspect_rules_lint_scala")
+bazel_dep(name = "rules_lint")
+bazel_dep(name = "rules_lint_scala")
 bazel_dep(name = "protobuf", version = "35.1")
 bazel_dep(name = "rules_java", version = "9.3.0")
 bazel_dep(name = "rules_jvm_external", version = "7.0")
 bazel_dep(name = "rules_scala", version = "7.2.6")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 
 local_path_override(
-    module_name = "aspect_rules_lint_scala",
+    module_name = "rules_lint_scala",
     path = "../../lint/scala",
 )
 

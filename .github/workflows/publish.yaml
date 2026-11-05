@@ -22,7 +22,7 @@ on:
       module_roots:
         description: |
           Newline-separated module roots to publish, e.g. "." for the root
-          aspect_rules_lint module or "lint/rust" for aspect_rules_lint_rust.
+          rules_lint module or "lint/rust" for rules_lint_rust.
           Required because this repo hosts several separately versioned
           modules: each release tag belongs to exactly one of them, so the
           publish must name which module the tag's version applies to.

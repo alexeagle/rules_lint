@@ -77,7 +77,7 @@ jobs:
           bazelrc: |
             common     --show_progress_rate_limit=60
             common     --show_timestamps
-            build:lint --no@aspect_rules_lint//lint:color
+            build:lint --no@rules_lint//lint:color
             common:aspect-cloud --remote_cache_header=X-Aspect=${{ secrets.OSS_SAAS_PAT }}
             common:aspect-cloud --bes_header=X-Aspect=${{ secrets.OSS_SAAS_PAT }}
       # `aspect` must be on PATH: the rc's aspect-cloud section runs
@@ -185,7 +185,7 @@ jobs:
 
           bazel build $BAZEL_ASPECT_FLAGS --config=lint \
             --output_groups=rules_lint_patch \
-            --@aspect_rules_lint//lint:fix \
+            --@rules_lint//lint:fix \
             //...
   # Same examples as `lint`, exercised through `aspect lint` — the
   # better-DX entry point users actually run. Each example registers its

@@ -6,10 +6,10 @@ Ty is provided as a built-in tool by rules_lint. To use the built-in version,
 create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:ty.bzl", "lint_ty_aspect")
+load("@rules_lint//lint:ty.bzl", "lint_ty_aspect")
 
 ty = lint_ty_aspect(
-    binary = Label("@aspect_rules_lint//lint:ty_bin"),
+    binary = Label("@rules_lint//lint:ty_bin"),
     config = Label("//:ty.toml"),
 )
 ```

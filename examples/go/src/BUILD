@@ -1,4 +1,4 @@
-load("@aspect_rules_lint//format:defs.bzl", "format_test")
+load("@rules_lint//format:defs.bzl", "format_test")
 load("@rules_go//go:def.bzl", "go_binary")
 
 package(default_visibility = ["//visibility:public"])

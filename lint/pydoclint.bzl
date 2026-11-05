@@ -23,7 +23,7 @@ py_binary(
 Finally, create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:pydoclint.bzl", "lint_pydoclint_aspect")
+load("@rules_lint//lint:pydoclint.bzl", "lint_pydoclint_aspect")
 
 pydoclint = lint_pydoclint_aspect(
     binary = Label("//tools/lint:pydoclint"),

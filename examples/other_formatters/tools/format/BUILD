@@ -1,4 +1,4 @@
-load("@aspect_rules_lint//format:defs.bzl", "format_multirun")
+load("@rules_lint//format:defs.bzl", "format_multirun")
 load("@npm//:prettier/package_json.bzl", prettier = "bin")
 load("@rules_python//python/entry_points:py_console_script_binary.bzl", "py_console_script_binary")
 
@@ -21,11 +21,11 @@ prettier.prettier_binary(
 
 format_multirun(
     name = "format",
-    cue = "@aspect_rules_lint//format:cue",
+    cue = "@rules_lint//format:cue",
     gherkin = ":prettier",
     graphql = ":prettier",
     html_jinja = ":djlint",
     javascript = ":prettier",  # javascript includes JSON, JSON5, TypeScript, TSX, and Vue
-    jsonnet = "@aspect_rules_lint//format:jsonnetfmt",
+    jsonnet = "@rules_lint//format:jsonnetfmt",
     visibility = ["//:__subpackages__"],
 )

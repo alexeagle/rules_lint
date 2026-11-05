@@ -30,7 +30,7 @@ The file name must be suffixed by either `.clippy.toml` or `clippy.toml`, otherw
 Finally, create the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint_rules_rust//:clippy.bzl", "lint_clippy_aspect")
+load("@rules_lint_rules_rust//:clippy.bzl", "lint_clippy_aspect")
 
 clippy = lint_clippy_aspect(
     config = Label("//:.clippy.toml"),
@@ -41,7 +41,7 @@ clippy = lint_clippy_aspect(
 
 Now your targets will be linted with clippy.
 If you wish a target to be excluded from linting, you can give them the `noclippy` tag.
-If you wish a clippy lint exception to fail the build, please enable the `--@aspect_rules_lint//lint:fail_on_violation` flag.
+If you wish a clippy lint exception to fail the build, please enable the `--@rules_lint//lint:fail_on_violation` flag.
 
 Please note that the aspect will propagate to all transitive Rust dependencies of your
 `rust_library`, `rust_binary`, and `rust_test` targets.
@@ -49,8 +49,8 @@ Please note that the aspect will propagate to all transitive Rust dependencies o
 Please watch issue https://github.com/aspect-build/rules_lint/issues/385 for updates on this behavior.
 """
 
-load("@aspect_rules_lint//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OUTFILE_FORMAT", "filter_srcs", "noop_lint_action", "output_files", "patch_and_output_files", "should_visit")
-load("@aspect_rules_lint//lint/private:patcher_action.bzl", "patcher_attrs", "run_patcher")
+load("@rules_lint//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OUTFILE_FORMAT", "filter_srcs", "noop_lint_action", "output_files", "patch_and_output_files", "should_visit")
+load("@rules_lint//lint/private:patcher_action.bzl", "patcher_attrs", "run_patcher")
 load("@rules_rust//rust:defs.bzl", "rust_clippy_action")
 
 _MNEMONIC = "AspectRulesLintClippy"
@@ -235,7 +235,7 @@ def lint_clippy_aspect(config, rule_kinds = DEFAULT_RULE_KINDS, clippy_flags = [
     """.format(default_rule_kinds = DEFAULT_RULE_KINDS)
     attrs = {
         "_options": attr.label(
-            default = "@aspect_rules_lint//lint:options",
+            default = "@rules_lint//lint:options",
             providers = [LintOptionsInfo],
         ),
         "_config_file": attr.label(
@@ -252,7 +252,7 @@ def lint_clippy_aspect(config, rule_kinds = DEFAULT_RULE_KINDS, clippy_flags = [
             default = args,
         ),
         "_process_wrapper_wrapper": attr.label(
-            doc = "A wrapper around the rules_rust process wrapper. See @aspect_rules_lint_rules_rust//:process_wrapper_wrapper for motivation and documentation.",
+            doc = "A wrapper around the rules_rust process wrapper. See @rules_lint_rules_rust//:process_wrapper_wrapper for motivation and documentation.",
             default = Label("//:process_wrapper_wrapper"),
             executable = True,
             cfg = "exec",

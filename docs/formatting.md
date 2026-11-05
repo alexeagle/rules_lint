@@ -8,7 +8,7 @@ This file contains a `format_multirun` rule. To use the tools supplied by defaul
 just make a simple call to it like so:
 
 ```starlark
-load("@aspect_rules_lint//format:defs.bzl", "format_multirun")
+load("@rules_lint//format:defs.bzl", "format_multirun")
 
 format_multirun(name = "format")
 ```
@@ -41,7 +41,7 @@ To register the tools you fetch, supply them as values for that language attribu
 For example:
 
 ```starlark
-load("@aspect_rules_lint//format:defs.bzl", "format_multirun")
+load("@rules_lint//format:defs.bzl", "format_multirun")
 
 format_multirun(
     name = "format",
@@ -73,7 +73,7 @@ indent_size = 4
 You can override the default command-line arguments passed to formatters by specifying custom arguments for each language and mode:
 
 ```starlark
-load("@aspect_rules_lint//format:defs.bzl", "format_multirun")
+load("@rules_lint//format:defs.bzl", "format_multirun")
 
 format_multirun(
     name = "format",
@@ -135,7 +135,7 @@ In this case you can add this in your `.pre-commit-config.yaml`:
 ```yaml
 - repo: local
   hooks:
-    - id: aspect_rules_lint
+    - id: rules_lint
       name: Format
       language: system
       entry: bazel run //:format
@@ -225,7 +225,7 @@ Note that developers may not remember to add `format_test` for their new source 
 unless you also use a tool like [Gazelle] to automatically update BUILD files.
 
 ```starlark
-load("@aspect_rules_lint//format:defs.bzl", "format_test")
+load("@rules_lint//format:defs.bzl", "format_test")
 
 format_test(
     name = "format_test",
@@ -244,7 +244,7 @@ when the formatters are fast enough, and/or the number of files in the repositor
 To acknowledge this fact, this mode requires an additional opt-in attribute, `no_sandbox`.
 
 ```starlark
-load("@aspect_rules_lint//format:defs.bzl", "format_test")
+load("@rules_lint//format:defs.bzl", "format_test")
 
 format_test(
     name = "format_test",

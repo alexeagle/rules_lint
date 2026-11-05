@@ -1,11 +1,11 @@
 "Bazel dependencies for C# formatting example"
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 bazel_dep(name = "rules_dotnet", version = "0.20.5")
 bazel_dep(name = "bazel_skylib", version = "1.4.2")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 

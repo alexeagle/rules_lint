@@ -1,15 +1,15 @@
 "Bazel dependencies for TOML formatting and linting example"
 
-bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_lint")
 bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "platforms", version = "1.0.0")
 
 local_path_override(
-    module_name = "aspect_rules_lint",
+    module_name = "rules_lint",
     path = "../..",
 )
 
 # TOML formatter/linter tool
-format_tools = use_extension("@aspect_rules_lint//format:extensions.bzl", "tools")
+format_tools = use_extension("@rules_lint//format:extensions.bzl", "tools")
 format_tools.taplo()
 use_repo(format_tools, "taplo", "taplo_mac")

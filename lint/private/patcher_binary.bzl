@@ -35,7 +35,7 @@ def patcher_binary(name):
         entry_point = "patcher.mjs",
         env = {"DIFF_BIN": "$(rlocationpath {})".format(diff_bin)},
         log_level = select({
-            "@aspect_rules_lint//lint:debug.enabled": "debug",
+            "@rules_lint//lint:debug.enabled": "debug",
             "//conditions:default": "error",
         }),
         # Because aspect visibility rules are not on by default.

@@ -1,7 +1,7 @@
 "Bazel dependencies"
 
 module(
-    name = "aspect_rules_lint",
+    name = "rules_lint",
     bazel_compatibility = [">=7.6.0"],
     compatibility_level = 1,
 )
@@ -48,7 +48,7 @@ multitool.hub(lockfile = "//format:multitool.lock.json")
 multitool.hub(lockfile = "//lint:multitool.lock.json")
 use_repo(multitool, "multitool")
 
-rules_lint_toolchains = use_extension("@aspect_rules_lint//lint:extensions.bzl", "toolchains")
+rules_lint_toolchains = use_extension("@rules_lint//lint:extensions.bzl", "toolchains")
 rules_lint_toolchains.sarif_parser()
 use_repo(rules_lint_toolchains, "sarif_parser_toolchains")
 

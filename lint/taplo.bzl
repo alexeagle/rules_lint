@@ -15,7 +15,7 @@ alias(
 Then declare the linter aspect, typically in `tools/lint/linters.bzl`:
 
 ```starlark
-load("@aspect_rules_lint//lint:taplo.bzl", "lint_taplo_aspect")
+load("@rules_lint//lint:taplo.bzl", "lint_taplo_aspect")
 
 taplo = lint_taplo_aspect(
     binary = Label("//tools/lint:taplo"),

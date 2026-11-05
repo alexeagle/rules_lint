@@ -4,7 +4,7 @@ lint-with-psscriptanalyzer (or any rule kinds provided by the caller).
 Typical usage in tools/lint/linters.bzl:
 
 ```starlark
-load("@aspect_rules_lint//lint:ps_script_analyzer.bzl", "lint_ps_script_analyzer_aspect")
+load("@rules_lint//lint:ps_script_analyzer.bzl", "lint_ps_script_analyzer_aspect")
 
 ps_script_analyzer = lint_ps_script_analyzer_aspect(
     binary           = Label("@pwsh//:pwsh"),
@@ -153,7 +153,7 @@ def lint_ps_script_analyzer_aspect(
                 allow_single_file = True,
             ),
             "_wrapper": attr.label(
-                default = "@aspect_rules_lint//lint:ps_script_analyzer_wrapper.ps1",
+                default = "@rules_lint//lint:ps_script_analyzer_wrapper.ps1",
                 allow_single_file = True,
             ),
             "_rule_kinds": attr.string_list(

@@ -1,6 +1,6 @@
 """Define fetches needed for tools"""
 
-load("@aspect_rules_lint//tools/toolchains:sarif_parser_toolchain.bzl", "SARIF_PARSER_PLATFORMS", "sarif_parser_platform_repo", "sarif_parser_toolchains_repo")
+load("@rules_lint//tools/toolchains:sarif_parser_toolchain.bzl", "SARIF_PARSER_PLATFORMS", "sarif_parser_platform_repo", "sarif_parser_toolchains_repo")
 
 # buildifier: disable=bzl-visibility
 load("@bazel_lib//lib/private:source_toolchains_repo.bzl", "source_toolchains_repo")
@@ -22,10 +22,10 @@ def register_sarif_parser_toolchains(name = DEFAULT_SARIF_PARSER_REPOSITORY, reg
         if not register:
             source_toolchains_repo(
                 name = "%s_toolchains" % name,
-                toolchain_type = "@aspect_rules_lint//tools/toolchains:sarif_parser_toolchain_type",
-                toolchain_rule_load_from = "@aspect_rules_lint//tools/toolchains:sarif_parser_toolchain.bzl",
+                toolchain_type = "@rules_lint//tools/toolchains:sarif_parser_toolchain_type",
+                toolchain_rule_load_from = "@rules_lint//tools/toolchains:sarif_parser_toolchain.bzl",
                 toolchain_rule = "sarif_parser_toolchain",
-                binary = "@aspect_rules_lint//tools/sarif/cmd/sarif",
+                binary = "@rules_lint//tools/sarif/cmd/sarif",
             )
         return
 

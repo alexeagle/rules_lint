@@ -42,7 +42,7 @@ alias(
 
 5. Create the linter aspect, typically in `tools/lint/linters.bzl`:
 ```starlark
-load("@aspect_rules_lint//lint:standardrb.bzl", "lint_standardrb_aspect")
+load("@rules_lint//lint:standardrb.bzl", "lint_standardrb_aspect")
 
 standardrb = lint_standardrb_aspect(
     binary = "//tools/lint:standardrb",

@@ -1,0 +1,120 @@
+diff --git a/ruby/extensions.bzl b/ruby/extensions.bzl
+--- a/ruby/extensions.bzl
++++ b/ruby/extensions.bzl
+@@ -22,6 +22,7 @@
+     "gem_checksums": attr.string_dict(),
+     "bundler_remote": attr.string(default = "https://rubygems.org/"),
+     "bundler_checksums": attr.string_dict(),
++    "patches": attr.string_keyed_label_dict(),
+ })
+ 
+ ruby_toolchain = tag_class(attrs = {
+@@ -60,6 +61,7 @@
+                 gem_checksums = bundle_fetch.gem_checksums,
+                 bundler_remote = bundle_fetch.bundler_remote,
+                 bundler_checksums = bundle_fetch.bundler_checksums,
++                patches = bundle_fetch.patches,
+             )
+             if module_ctx.is_dev_dependency(bundle_fetch):
+                 direct_dev_dep_names.append(bundle_fetch.name)
+diff --git a/ruby/private/bundle_fetch.bzl b/ruby/private/bundle_fetch.bzl
+--- a/ruby/private/bundle_fetch.bzl
++++ b/ruby/private/bundle_fetch.bzl
+@@ -238,6 +238,7 @@
+             "{gem_install_fragments}": "".join(gem_install_fragments),
+             "{env}": repr(repository_ctx.attr.env),
+             "{ruby}": ruby_toolchain_attr,
++            "{patches}": repr({name: str(label) for name, label in repository_ctx.attr.patches.items()}),
+         },
+     )
+ 
+@@ -251,6 +252,7 @@
+             "bundler_remote": repository_ctx.attr.bundler_remote,
+             "bundler_checksums": repository_ctx.attr.bundler_checksums,
+             "gem_checksums": gem_checksums,
++            "patches": repository_ctx.attr.patches,
+         }
+     return None
+ 
+@@ -301,6 +303,9 @@
+             default = {},
+             doc = "SHA-256 checksums for remote gems. Keys are gem names (e.g. foobar-1.2.3), values are SHA-256 checksums.",
+         ),
++        "patches": attr.string_keyed_label_dict(
++            doc = "Gem full name to patch file; patches are applied with -p1 after bundle installation.",
++        ),
+         "ruby": attr.label(
+             doc = "Override Ruby toolchain to use for installation.",
+             providers = [platform_common.ToolchainInfo],
+diff --git a/ruby/private/bundle_fetch/BUILD.tpl b/ruby/private/bundle_fetch/BUILD.tpl
+--- a/ruby/private/bundle_fetch/BUILD.tpl
++++ b/ruby/private/bundle_fetch/BUILD.tpl
+@@ -11,6 +11,7 @@
+     gemfile = "{gemfile_path}",
+     gemfile_lock = "{gemfile_lock_path}",
+     gems = {gems},
++    patches = {patches},
+     ruby = {ruby},
+ )
+ 
+diff --git a/ruby/private/bundle_install.bzl b/ruby/private/bundle_install.bzl
+--- a/ruby/private/bundle_install.bzl
++++ b/ruby/private/bundle_install.bzl
+@@ -67,6 +67,18 @@
+         "BUNDLE_SHEBANG": _normalize_path(ctx, toolchain.ruby.short_path),
+     })
+ 
++    if ctx.attr.patches and _is_windows(ctx):
++        fail("Gem patches require the Unix patch command.")
++
++    patch_cmds = [
++        'patch -d "{bundle_path}"/*/*/gems/"{gem}" -p1 < "{patch}"'.format(
++            bundle_path = bundle_path.path,
++            gem = gem,
++            patch = target.files.to_list()[0].path,
++        )
++        for gem, target in ctx.attr.patches.items()
++    ]
++
+     ctx.actions.expand_template(
+         template = template,
+         output = script,
+@@ -74,12 +86,13 @@
+             "{env}": _convert_env_to_script(ctx, env),
+             "{bundler_exe}": _normalize_path(ctx, bundler_exe),
+             "{ruby_path}": _normalize_path(ctx, toolchain.ruby.path),
++            "{patches}": "\n".join(patch_cmds),
+         },
+     )
+ 
+     ctx.actions.run(
+         executable = script,
+-        inputs = depset([ctx.file.gemfile, ctx.file.gemfile_lock] + ctx.files.srcs + ctx.files.gems),
++        inputs = depset([ctx.file.gemfile, ctx.file.gemfile_lock] + ctx.files.srcs + ctx.files.gems, transitive = [target.files for target in ctx.attr.patches.values()]),
+         outputs = [binstubs, bundle_path],
+         mnemonic = "BundleInstall",
+         progress_message = "Running bundle install (%{label})",
+@@ -139,6 +152,9 @@
+         "env": attr.string_dict(
+             doc = "Environment variables to use during installation.",
+         ),
++        "patches": attr.string_keyed_label_dict(
++            allow_files = True,
++        ),
+         "ruby": attr.label(
+             doc = "Override Ruby toolchain to use when installing the gem.",
+             providers = [platform_common.ToolchainInfo],
+diff --git a/ruby/private/bundle_install/bundle_install.sh.tpl b/ruby/private/bundle_install/bundle_install.sh.tpl
+--- a/ruby/private/bundle_install/bundle_install.sh.tpl
++++ b/ruby/private/bundle_install/bundle_install.sh.tpl
+@@ -1,7 +1,10 @@
+ #!/usr/bin/env bash
++set -euo pipefail
+ 
+ {env}
+ 
+ {ruby_path} {bundler_exe} install --standalone --local 
+ 
++{patches}
++
+ # vim: ft=bash

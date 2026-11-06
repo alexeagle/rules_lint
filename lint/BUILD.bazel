@@ -148,8 +148,13 @@ bzl_library(
     name = "oxlint",
     srcs = ["oxlint.bzl"],
     deps = [
+        "//lint/private:js_linter_inputs",
         "//lint/private:lint_aspect",
         "//lint/private:patcher_action",
+        "@aspect_rules_js//js:libs",
+        "@aspect_rules_js//js:providers",
+        "@bazel_lib//lib:paths",
+        "@bazel_skylib//lib:shell",
     ],
 )
 

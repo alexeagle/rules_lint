@@ -33,7 +33,8 @@ The `src/` directory contains example files with intentional violations:
 
 - `hello.js` - Simple JavaScript file
 - `file.ts`, `file-dep.ts` - TypeScript files with ESLint violations
-- `oxlint-fixable.ts` - TypeScript with an auto-fixable Oxlint violation
+- `oxlint-fixable.ts` - Built-in and custom plugin violations requiring multiple fix passes
+- `oxlint_typed/` - Type-aware linting with inherited tsconfig paths and dependency declarations
 - `hello.tsx` - React TypeScript file
 - `hello.vue` - Vue component
 - `hello.css`, `clean.css` - CSS files (one with violations, one clean)

@@ -1,0 +1,3 @@
+{
+  "rules": { "oxc/no-const-enum": "error" }
+}

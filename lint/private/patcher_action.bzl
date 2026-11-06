@@ -23,7 +23,9 @@ def run_patcher(
         mnemonic = None,
         progress_message = None,
         patch_cfg_suffix = "patch_cfg",
-        patch_cfg_name = None):
+        patch_cfg_name = None,
+        max_fix_passes = 1,
+        chdir = None):
     """Run the linter in a sandbox, in a mode where it applies fixes to source files it reads.
 
     Collects the edits made to the sandbox into a patch file.
@@ -45,6 +47,8 @@ def run_patcher(
         progress_message: action progress message
         patch_cfg_suffix: suffix for the patch config file name (default: "patch_cfg")
         patch_cfg_name: patch config file name minus the suffix (default: ctx.label.name)
+        max_fix_passes: repeat the linter until file contents stabilize, up to this limit
+        chdir: optional working directory relative to the shadow execroot
     """
 
     # Create a patch config file to pass arguments to the patcher.mjs script
@@ -59,11 +63,15 @@ def run_patcher(
         "files_to_diff": files_to_diff,
         "output": patch_out.path,
     }
+    if chdir != None:
+        patch_cfg_dict["chdir"] = chdir
+    if max_fix_passes > 1:
+        patch_cfg_dict["max_fix_passes"] = max_fix_passes
     if patch_cfg_env != None:
         patch_cfg_dict["env"] = patch_cfg_env
 
     if type(args) == "Args":
-        args.use_param_file("%s", use_always=True)
+        args.use_param_file("%s", use_always = True)
         args.set_param_file_format("multiline")
         arguments.append(args)
     else:

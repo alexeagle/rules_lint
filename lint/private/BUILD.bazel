@@ -1,9 +1,17 @@
+load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("@bazel_lib//:bzl_library.bzl", "bzl_library")
 load(":patcher_binary.bzl", "patcher_binary")
 
 package(default_visibility = ["//lint:__subpackages__"])
 
 patcher_binary(name = "patcher")
+
+js_test(
+    name = "patcher_test",
+    size = "small",
+    data = ["patcher.mjs"],
+    entry_point = "patcher_test.mjs",
+)
 
 bzl_library(
     name = "lint_aspect",

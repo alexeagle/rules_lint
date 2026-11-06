@@ -20,10 +20,20 @@ eslint_test = lint_test(aspect = eslint)
 
 oxlint = lint_oxlint_aspect(
     binary = Label("//tools/lint:oxlint"),
-    config = Label("//:.oxlintrc.json"),
+    config = Label("//:oxlint_config"),
+    fix_binary = Label("//tools/lint:oxlint_for_fix"),
 )
 
 oxlint_test = lint_test(aspect = oxlint)
+
+oxlint_typed = lint_oxlint_aspect(
+    binary = Label("//tools/lint:oxlint"),
+    config = Label("//src:oxlint-typed.json"),
+    type_aware = True,
+    tsgolint = Label("//tools/lint:tsgolint"),
+)
+
+oxlint_typed_test = lint_test(aspect = oxlint_typed)
 
 stylelint = lint_stylelint_aspect(
     binary = Label("//tools/lint:stylelint"),

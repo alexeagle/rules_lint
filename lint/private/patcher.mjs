@@ -10,6 +10,7 @@ import childProcess from "node:child_process";
 import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
+import crypto from "node:crypto";
 
 function debug(...kwargs) {
   if (!!process.env.JS_BINARY__LOG_DEBUG) {
@@ -77,18 +78,58 @@ async function main(args, sandbox) {
       " "
     )} (with env ${JSON.stringify(config.env || {})})`
   );
-  const ret = childProcess.spawnSync(config.linter, spawnArgs, {
-    stdio: "inherit",
-    cwd: sandbox,
-    // Merge process.env so the linter wrapper (a bash script) can find PATH
-    env: Object.assign({}, process.env, config.env || {}),
-  });
+  const maxFixPasses = config.max_fix_passes || 1;
+  // Oxlint applies one set of non-overlapping fixes per invocation. Hash only
+  // writable sources so another pass can finish fixes exposed by the previous
+  // one. See https://github.com/oxc-project/oxc/issues/16118.
+  // Other linters keep their existing single-invocation behavior.
+  async function sourceState() {
+    const hash = crypto.createHash("sha256");
+    for (const file of config.files_to_diff) {
+      hash.update(
+        await fs.promises.readFile(path.join(sandbox, sourcePrefix, file))
+      );
+      hash.update("\0");
+    }
+    return hash.digest("hex");
+  }
 
-  // Check if we failed to spawn the process.
-  // If it ran normally and exited non-zero, ret.error will still be undefined
-  if (ret.error) {
-    console.error(ret.error);
-    process.exit(1);
+  let state = maxFixPasses > 1 ? await sourceState() : undefined;
+  const seenStates = new Set([state]);
+  let ret;
+  for (let pass = 1; pass <= maxFixPasses; pass++) {
+    const linter = config.chdir
+      ? path.resolve(sandbox, config.linter)
+      : config.linter;
+    ret = childProcess.spawnSync(linter, spawnArgs, {
+      stdio: "inherit",
+      cwd: path.join(sandbox, config.chdir || "."),
+      // Merge process.env so linter wrappers can resolve tools through PATH.
+      env: Object.assign({}, process.env, config.env || {}),
+    });
+    if (ret.error) {
+      throw ret.error;
+    }
+    if (ret.signal) {
+      throw new Error(`Linter terminated by ${ret.signal}`);
+    }
+    if (maxFixPasses === 1 || ret.status > 1) break;
+
+    const nextState = await sourceState();
+    if (nextState === state) break;
+    if (seenStates.has(nextState)) {
+      console.error(
+        `Linter fixes entered a cycle after ${pass} passes; stopping`
+      );
+      break;
+    }
+    seenStates.add(nextState);
+    state = nextState;
+    if (pass === maxFixPasses) {
+      console.error(
+        `Linter fixes did not converge after ${maxFixPasses} passes; stopping`
+      );
+    }
   }
 
   const diffOut = fs.openSync(config.output, "w");

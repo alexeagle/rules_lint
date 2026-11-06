@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "paths": { "@fixture/promise": ["./promise.d.ts"] },
+    "lib": ["es2020"],
+    "declaration": true
+  }
+}

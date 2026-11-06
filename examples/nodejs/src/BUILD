@@ -6,6 +6,8 @@ load("//tools/lint:linters.bzl", "eslint_test", "oxlint_test")
 
 package(default_visibility = ["//visibility:public"])
 
+exports_files(["oxlint-typed.json"])
+
 ts_config(
     name = "tsconfig",
     src = ":tsconfig.json",
@@ -88,6 +90,6 @@ format_test(
         "(special_char)/[square]/hello.md",
         "(special_char)/[square]/hello.ts",
     ],
-    javascript = ":prettier",
-    markdown = ":prettier",
+    javascript = "//tools/format:prettier",
+    markdown = "//tools/format:prettier",
 )

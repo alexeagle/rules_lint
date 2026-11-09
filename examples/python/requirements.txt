@@ -177,9 +177,9 @@ djlint==1.36.4 \
     --hash=sha256:ead475013bcac46095b1bbc8cf97ed2f06e83422335734363f8a76b4ba7e47c2 \
     --hash=sha256:ff9faffd7d43ac20467493fa71d5355b5b330a00ade1c4d1e859022f4195223b
     # via scaffold-test-4309 (pyproject.toml)
-docstring-parser-fork==0.0.14 \
-    --hash=sha256:4c544f234ef2cc2749a3df32b70c437d77888b1099143a1ad5454452c574b9af \
-    --hash=sha256:a2743a63d8d36c09650594f7b4ab5b2758fee8629dcf794d1b221b23179baa5c
+docstring-parser-fork==0.0.16 \
+    --hash=sha256:9ecf861ceab8b87d1297a71001c15a1956ad02e87434ee6473643a5988094f7c \
+    --hash=sha256:c024c97af582d6acf85a14f0b332b3a2ab08626648d251c25e47191f33064386
     # via pydoclint
 editorconfig==0.17.1 \
     --hash=sha256:1eda9c2c0db8c16dbd50111b710572a5e6de934e39772de1959d41f64fc17c82 \

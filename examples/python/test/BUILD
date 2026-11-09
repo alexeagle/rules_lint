@@ -90,6 +90,12 @@ pydoclint_test(
     srcs = [":generated_py_filegroup"],
 )
 
+# Regression test for https://github.com/aspect-build/rules_lint/issues/303
+ruff_test(
+    name = "ruff_recognizes_first_party_imports",
+    srcs = ["//src/first_party_imports:uses_first_party"],
+)
+
 ruff_test(
     name = "ruff_should_ignore_excluded",
     srcs = [":excluded_py"],

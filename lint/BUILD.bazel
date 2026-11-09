@@ -257,6 +257,7 @@ bzl_library(
         "//lint/private:lint_aspect",
         "//lint/private:patcher_action",
         "@bazel_skylib//lib:versions",
+        "@rules_python//python:defs_bzl",
     ],
 )
 

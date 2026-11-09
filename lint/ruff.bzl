@@ -45,12 +45,13 @@ ruff = lint_ruff_aspect(
 ```
 """
 
+load("@rules_python//python:defs.bzl", "PyInfo")
 load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "filter_srcs", "noop_lint_action", "output_files", "parse_to_sarif_action", "patch_and_output_files", "should_visit")
 load("//lint/private:patcher_action.bzl", "patcher_attrs", "run_patcher")
 
 _MNEMONIC = "AspectRulesLintRuff"
 
-def ruff_action(ctx, executable, srcs, config, stdout, exit_code = None, env = {}, patch = None, args = [], mnemonic = _MNEMONIC):
+def ruff_action(ctx, executable, srcs, config, stdout, exit_code = None, env = {}, patch = None, args = [], mnemonic = _MNEMONIC, extra_inputs = depset()):
     """Run ruff as an action under Bazel.
 
     Ruff will select the configuration file to use for each source file, as documented here:
@@ -77,8 +78,10 @@ def ruff_action(ctx, executable, srcs, config, stdout, exit_code = None, env = {
         env: environment variaables for ruff
         patch: output file for patch (optional). If provided, uses run_patcher instead of run_shell.
         args: additional command-line arguments to pass to ruff
+        extra_inputs: depset of additional files (e.g. transitive Python sources) to make available to the action,
+            so that ruff can classify imports as first-party.
     """
-    inputs = srcs + config
+    inputs = depset(srcs + config, transitive = [extra_inputs])
 
     action_args = ctx.actions.args()
     action_args.add("check")
@@ -132,6 +135,27 @@ def ruff_action(ctx, executable, srcs, config, stdout, exit_code = None, env = {
             tools = [executable],
         )
 
+def _transitive_python_sources(ctx):
+    """Collect the transitive Python sources of the rule's dependencies.
+
+    Ruff classifies an import as first-party only if the module exists on disk under its `src`
+    setting, which isn't the case in the sandbox unless we stage the dependencies.
+    Preserve the depset structure, including external sources, to avoid flattening each
+    target's dependency closure during analysis.
+    """
+
+    # Collect from deps, pyi_deps and srcs via PyInfo, same as the ty aspect.
+    transitive = []
+    for attr_name in ("deps", "pyi_deps", "srcs"):
+        if hasattr(ctx.rule.attr, attr_name):
+            for dep in getattr(ctx.rule.attr, attr_name):
+                if PyInfo in dep:
+                    transitive.append(dep[PyInfo].transitive_sources)
+                    # Older rules_python providers do not expose stub sources separately.
+                    if hasattr(dep[PyInfo], "transitive_pyi_files"):
+                        transitive.append(dep[PyInfo].transitive_pyi_files)
+    return depset(transitive = transitive)
+
 # buildifier: disable=function-docstring
 def _ruff_aspect_impl(target, ctx):
     if not should_visit(ctx.rule, ctx.attr._rule_kinds, ctx.attr._filegroup_tags):
@@ -147,6 +171,8 @@ def _ruff_aspect_impl(target, ctx):
         noop_lint_action(ctx, outputs)
         return [info]
 
+    extra_inputs = _transitive_python_sources(ctx)
+
     color_env = {"FORCE_COLOR": "1"} if ctx.attr._options[LintOptionsInfo].color else {}
 
     ruff_action(
@@ -160,11 +186,12 @@ def _ruff_aspect_impl(target, ctx):
         patch = getattr(outputs, "patch", None),
         args = ctx.attr._args,
         mnemonic = ctx.attr._mnemonic,
+        extra_inputs = extra_inputs,
     )
 
     # TODO(alex): if we run with --fix, this will report the issues that were fixed. Does a machine reader want to know about them?
     raw_machine_report = ctx.actions.declare_file(OUTFILE_FORMAT.format(label = target.label.name, mnemonic = ctx.attr._mnemonic, suffix = "raw_machine_report"))
-    ruff_action(ctx, ctx.executable._ruff, files_to_lint, ctx.files._config_files, raw_machine_report, outputs.machine.exit_code, args = ctx.attr._args)
+    ruff_action(ctx, ctx.executable._ruff, files_to_lint, ctx.files._config_files, raw_machine_report, outputs.machine.exit_code, args = ctx.attr._args, extra_inputs = extra_inputs)
 
     # Ideally we'd just use {"RUFF_OUTPUT_FORMAT": "sarif"} however it prints absolute paths; see https://github.com/astral-sh/ruff/issues/14985
     parse_to_sarif_action(ctx, ctx.attr._mnemonic, raw_machine_report, outputs.machine.out)

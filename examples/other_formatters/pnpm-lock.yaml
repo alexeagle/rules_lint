@@ -1,10 +1,11 @@
-lockfileVersion: "9.0"
+lockfileVersion: '9.0'
 
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
 importers:
+
   .:
     dependencies:
       prettier:
@@ -12,80 +13,58 @@ importers:
         version: 3.7.4
       prettier-plugin-gherkin:
         specifier: ^3
-        version: 3.1.3
+        version: 3.1.4
 
 packages:
-  "@cucumber/gherkin@32.2.0":
-    resolution:
-      {
-        integrity: sha512-X8xuVhSIqlUjxSRifRJ7t0TycVWyX58fygJH3wDNmHINLg9sYEkvQT0SO2G5YlRZnYc11TIFr4YPenscvdlBIw==,
-      }
 
-  "@cucumber/messages@27.2.0":
-    resolution:
-      {
-        integrity: sha512-f2o/HqKHgsqzFLdq6fAhfG1FNOQPdBdyMGpKwhb7hZqg0yZtx9BVqkTyuoNk83Fcvk3wjMVfouFXXHNEk4nddA==,
-      }
+  '@cucumber/gherkin@32.2.0':
+    resolution: {integrity: sha512-X8xuVhSIqlUjxSRifRJ7t0TycVWyX58fygJH3wDNmHINLg9sYEkvQT0SO2G5YlRZnYc11TIFr4YPenscvdlBIw==}
 
-  "@types/uuid@10.0.0":
-    resolution:
-      {
-        integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==,
-      }
+  '@cucumber/messages@27.2.0':
+    resolution: {integrity: sha512-f2o/HqKHgsqzFLdq6fAhfG1FNOQPdBdyMGpKwhb7hZqg0yZtx9BVqkTyuoNk83Fcvk3wjMVfouFXXHNEk4nddA==}
+
+  '@types/uuid@10.0.0':
+    resolution: {integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==}
 
   class-transformer@0.5.1:
-    resolution:
-      {
-        integrity: sha512-SQa1Ws6hUbfC98vKGxZH3KFY0Y1lm5Zm0SY8XX9zbK7FJCyVEac3ATW0RIpwzW+oOfmHE5PMPufDG9hCfoEOMw==,
-      }
+    resolution: {integrity: sha512-SQa1Ws6hUbfC98vKGxZH3KFY0Y1lm5Zm0SY8XX9zbK7FJCyVEac3ATW0RIpwzW+oOfmHE5PMPufDG9hCfoEOMw==}
 
-  prettier-plugin-gherkin@3.1.3:
-    resolution:
-      {
-        integrity: sha512-w9uB413NlSi8ZQwpexyu+ttriJJ88eZLV0x88ZTkzkLZyHYEX5wrNtaCx/yFYviIu/tuwsBqDPM47VODnIV/hw==,
-      }
+  prettier-plugin-gherkin@3.1.4:
+    resolution: {integrity: sha512-Mccs8tUhv7iCAhSkgvdupuJt5nj28UK6Ixsmui6TdVnvDRwy4wwEKv6du4mdMB2S7Oj0xQPTNO53Jo8alj+1bg==}
 
   prettier@3.7.4:
-    resolution:
-      {
-        integrity: sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA==,
-      }
-    engines: { node: ">=14" }
+    resolution: {integrity: sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA==}
+    engines: {node: '>=14'}
     hasBin: true
 
   reflect-metadata@0.2.2:
-    resolution:
-      {
-        integrity: sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==,
-      }
+    resolution: {integrity: sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==}
 
   uuid@11.0.5:
-    resolution:
-      {
-        integrity: sha512-508e6IcKLrhxKdBbcA2b4KQZlLVp2+J5UwQ6F7Drckkc5N9ZJwFa4TgWtsww9UG8fGHbm6gbV19TdM5pQ4GaIA==,
-      }
+    resolution: {integrity: sha512-508e6IcKLrhxKdBbcA2b4KQZlLVp2+J5UwQ6F7Drckkc5N9ZJwFa4TgWtsww9UG8fGHbm6gbV19TdM5pQ4GaIA==}
     hasBin: true
 
 snapshots:
-  "@cucumber/gherkin@32.2.0":
-    dependencies:
-      "@cucumber/messages": 27.2.0
 
-  "@cucumber/messages@27.2.0":
+  '@cucumber/gherkin@32.2.0':
     dependencies:
-      "@types/uuid": 10.0.0
+      '@cucumber/messages': 27.2.0
+
+  '@cucumber/messages@27.2.0':
+    dependencies:
+      '@types/uuid': 10.0.0
       class-transformer: 0.5.1
       reflect-metadata: 0.2.2
       uuid: 11.0.5
 
-  "@types/uuid@10.0.0": {}
+  '@types/uuid@10.0.0': {}
 
   class-transformer@0.5.1: {}
 
-  prettier-plugin-gherkin@3.1.3:
+  prettier-plugin-gherkin@3.1.4:
     dependencies:
-      "@cucumber/gherkin": 32.2.0
-      "@cucumber/messages": 27.2.0
+      '@cucumber/gherkin': 32.2.0
+      '@cucumber/messages': 27.2.0
       prettier: 3.7.4
 
   prettier@3.7.4: {}

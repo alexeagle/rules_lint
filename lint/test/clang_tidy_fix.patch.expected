@@ -1,0 +1,5 @@
+--- a/lint/test/clang_tidy_fix_input.txt
++++ b/lint/test/clang_tidy_fix_input.txt
+@@ -1 +1 @@
+-unfixed
++fixed

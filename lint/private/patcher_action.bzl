@@ -63,7 +63,7 @@ def run_patcher(
         patch_cfg_dict["env"] = patch_cfg_env
 
     if type(args) == "Args":
-        args.use_param_file("%s", use_always=True)
+        args.use_param_file("%s", use_always = True)
         args.set_param_file_format("multiline")
         arguments.append(args)
     else:
@@ -113,6 +113,10 @@ def run_patcher(
         "arguments": arguments,
         "env": final_env,
         "tools": tools,
+        # Workaround for the rules_js launcher's undeclared mktemp dependency (#547).
+        # Honor --action_env until that launcher supplies its own utilities.
+        # Explicit env values still take precedence.
+        "use_default_shell_env": True,
     }
     if mnemonic != None:
         kwargs["mnemonic"] = mnemonic

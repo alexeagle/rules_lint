@@ -44,6 +44,8 @@ load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_common")
 load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "noop_lint_action", "output_files", "parse_to_sarif_action", "patch_and_output_files", "should_visit")
 load("//lint/private:patcher_action.bzl", "patcher_attrs", "run_patcher")
 
+_COREUTILS_TOOLCHAIN = Label("@bazel_lib//lib:coreutils_toolchain_type")
+
 _MNEMONIC = "AspectRulesLintClangTidy"
 _DISABLED_FEATURES = [
     "layering_check",
@@ -310,7 +312,7 @@ def clang_tidy_action(ctx, compilation_context, executable, srcs, stdout, exit_c
     https://clang.llvm.org/extra/clang-tidy/
 
     Args:
-        ctx: an action context OR aspect context
+        ctx: an action context OR aspect context with the coreutils and C++ toolchains
         compilation_context: from target
         executable: struct with a clang-tidy field
         srcs: file objects to lint
@@ -326,7 +328,8 @@ def clang_tidy_action(ctx, compilation_context, executable, srcs, stdout, exit_c
     clang_tidy_args = list(args) + _get_args(ctx, compilation_context, srcs)
     compiler_args = _get_compiler_args(ctx, compilation_context, srcs)
     env = _get_env(ctx, srcs)
-    tools = [executable._clang_tidy_wrapper, executable._clang_tidy, find_cpp_toolchain(ctx).all_files]
+    coreutils = ctx.toolchains[_COREUTILS_TOOLCHAIN].coreutils_info.bin
+    tools = [executable._clang_tidy_wrapper, executable._clang_tidy, coreutils, find_cpp_toolchain(ctx).all_files]
 
     if patch != None:
         # Use run_patcher for fix mode
@@ -334,7 +337,7 @@ def clang_tidy_action(ctx, compilation_context, executable, srcs, stdout, exit_c
             ctx,
             executable,
             inputs = inputs,
-            args = [executable._clang_tidy.path, "--fix"] + clang_tidy_args + ["--"] + compiler_args,
+            args = [coreutils.path, executable._clang_tidy.path, "--fix"] + clang_tidy_args + ["--"] + compiler_args,
             files_to_diff = [src.path for src in srcs],
             patch_out = patch,
             tools = tools,
@@ -366,7 +369,7 @@ def clang_tidy_action(ctx, compilation_context, executable, srcs, stdout, exit_c
             outputs = outputs,
             tools = tools,
             command = executable._clang_tidy_wrapper.path + " $@",
-            arguments = [executable._clang_tidy.path] + clang_tidy_args + ["--", compiler_args_obj],
+            arguments = [coreutils.path, executable._clang_tidy.path] + clang_tidy_args + ["--", compiler_args_obj],
             env = env,
             mnemonic = _MNEMONIC,
             progress_message = "Linting %{{label}}:{} with clang-tidy".format(srcs[0].basename),
@@ -523,6 +526,7 @@ def lint_clang_tidy_aspect(
             ),
         },
         toolchains = [
+            _COREUTILS_TOOLCHAIN,
             OPTIONAL_SARIF_PARSER_TOOLCHAIN,
             "@bazel_tools//tools/cpp:toolchain_type",
         ],

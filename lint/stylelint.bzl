@@ -198,10 +198,12 @@ def _stylelint_aspect_impl(target, ctx):
     parse_to_sarif_action(ctx, _MNEMONIC, raw_machine_report, outputs.machine.out)
 
     if patch_exit_code:
+        # The fixer runs separately to preserve the report of fixed violations.
+        # Expose its exit code with human outputs, as other fixing linters do.
         info = OutputGroupInfo(
-            rules_lint_human = info.rules_lint_human,
+            rules_lint_human = depset([patch_exit_code], transitive = [info.rules_lint_human]),
             rules_lint_machine = info.rules_lint_machine,
-            rules_lint_patch = depset([patch_exit_code], transitive = [info.rules_lint_patch]),
+            rules_lint_patch = info.rules_lint_patch,
         )
 
     return [info]

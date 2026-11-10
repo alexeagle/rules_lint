@@ -183,7 +183,11 @@ function ls-files {
 
         # TODO: determine which staged changes we should format; avoid formatting unstaged changes
         # TODO: try to format only modified regions of the file (where supported)
-        files=$(git ls-files -t --cached --modified --other --exclude-standard "${patterns[@]}" "${patterns[@]/#/*/}" | grep -v ^S | cut -f2- -d' ' | {
+        git_patterns=("${patterns[@]}" "${patterns[@]/#/*/}")
+        for (( i=0; i<${#exclusions[@]}; i++ )); do
+          git_patterns+=(":(exclude)${exclusions[$i]}")
+        done
+        files=$(git ls-files -t --cached --modified --other --exclude-standard "${git_patterns[@]}" | grep -v ^S | cut -f2- -d' ' | {
           grep -vE \
             "^$(git ls-files --deleted)$" \
           || true;
@@ -215,7 +219,11 @@ function ls-files {
           fi
           find_args+=("-name" "${patterns[$i]}")
         done
-        [ ${#patterns[@]} -ne 0 ] && find_args+=(')' "-print")
+        [ ${#patterns[@]} -ne 0 ] && find_args+=(')')
+        for (( i=0; i<${#exclusions[@]}; i++ )); do
+          find_args+=('!' '-name' "${exclusions[$i]}")
+        done
+        [ ${#patterns[@]} -ne 0 ] && find_args+=("-print")
         if [ -n "$shebang_re" ]; then
           [ ${#patterns[@]} -ne 0 ] && find_args+=('-or')
           find_args+=(
@@ -227,24 +235,6 @@ function ls-files {
           )
         fi
         files=$(find "$@" "${find_args[@]}")
-    fi
-
-    # Apply exclusion patterns using bash glob matching
-    if [ ${#exclusions[@]} -gt 0 ] && [ -n "$files" ]; then
-        filtered_files=""
-        while IFS= read -r file; do
-            excluded=false
-            for exclusion in "${exclusions[@]}"; do
-                if [[ "$file" == $exclusion ]]; then
-                    excluded=true
-                    break
-                fi
-            done
-            if [[ -n "$file" && "$excluded" == false ]]; then
-                filtered_files+="${file}"$'\n'
-            fi
-        done <<< "$files"
-        files="${filtered_files%$'\n'}"  # Remove trailing newline
     fi
 
     if [[ ${disable_git_attribute_checks:-} == true ]]; then

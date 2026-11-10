@@ -197,7 +197,10 @@ function ls-files {
         })
 
         if [ -n "$shebang_re" ]; then
-            for candidate in $(git ls-files -t --cached --modified --other --exclude-standard | grep -v ^S | cut -f2- -d' ' | grep -v '\.' | {
+            # Skip files whose name has an extension. Only the last path
+            # component counts, so scripts under a directory such as .github/
+            # are still checked, as find's ! -name '*.*' does below.
+            for candidate in $(git ls-files -t --cached --modified --other --exclude-standard | grep -v ^S | cut -f2- -d' ' | grep -v '\.[^/]*$' | {
                 grep -vFxf \
                 <(git ls-files --deleted) \
                 || true;

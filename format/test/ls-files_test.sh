@@ -90,6 +90,23 @@ sh=$(disable_git_attribute_checks=true ls-files Shell)
 }
 rm script
 
+# Extensionless shell scripts are found by their shebang under a dot-directory
+# too, with or without path arguments. A file with an extension is not.
+mkdir .hooks
+printf '#!/usr/bin/env bash\necho hello\n' >.hooks/pre-commit
+cp .hooks/pre-commit .hooks/notes.txt
+sh=$(ls-files Shell)
+[[ "$sh" == ".hooks/pre-commit" ]] || {
+    echo >&2 -e "expected ls-files to return .hooks/pre-commit, was\n$sh"
+    exit 1
+}
+sh=$(ls-files Shell .hooks)
+[[ "$sh" == ".hooks/pre-commit" ]] || {
+    echo >&2 -e "expected ls-files .hooks to return .hooks/pre-commit, was\n$sh"
+    exit 1
+}
+rm -r .hooks
+
 # deleted files should be ignored
 git rm src.css
 css=$(ls-files CSS)

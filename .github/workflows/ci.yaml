@@ -37,29 +37,40 @@ jobs:
       - name: "List examples that have a tools/format folder"
         id: set-format-matrix
         run: |
-          folders=$(find examples -type d -path "*/tools/format" | sed 's|/tools/format||' | jq -R -s -c 'split("\n") | map(select(length > 0))')
-          echo "matrix=$folders" >> "$GITHUB_OUTPUT"
-          echo "Generated format matrix: $folders"
+          matrix=$(find examples -type d -path "*/tools/format" | sed 's|/tools/format||' | jq -R -s -c 'split("\n") | map(select(length > 0)) | {folder: .}')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "Generated format matrix: $matrix"
       - name: "List examples that have a tools/lint folder"
         id: set-lint-matrix
         run: |
-          folders=$(find examples -type d -path "*/tools/lint" | sed 's|/tools/lint||' | jq -R -s -c 'split("\n") | map(select(length > 0))')
-          echo "matrix=$folders" >> "$GITHUB_OUTPUT"
-          echo "Generated lint matrix: $folders"
+          matrix=$(find examples -type d -path "*/tools/lint" | sed 's|/tools/lint||' | jq -R -s -c 'split("\n") | map(select(length > 0)) | {folder: .}')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "Generated lint matrix: $matrix"
       - name: "Find all examples that have test/*.bats files"
         id: set-test-matrix
         run: |
-          folders=$(find examples -name "*.bats" -path "*/test/*" | sed 's|/test/.*||' | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
-          echo "matrix=$folders" >> "$GITHUB_OUTPUT"
-          echo "Generated test matrix: $folders"
+          # FIXME: the excluded examples are failing; diagnose before enabling them.
+          matrix=$(find examples -name "*.bats" -path "*/test/*" | sed 's|/test/.*||' | sort -u | jq -R -s -c '
+            split("\n") | map(select(length > 0)) |
+            {
+              folder: .,
+              include: [{folder: "format"}],
+              exclude: [
+                {folder: "examples/python"},
+                {folder: "examples/cpp"},
+                {folder: "examples/java"},
+                {folder: "examples/shell"}
+              ]
+            }')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "Generated test matrix: $matrix"
   format:
     needs: list-examples
     # Our version of clang-format has some deps that aren't satisfiable on newer ubuntu yet
     runs-on: ${{ matrix.folder == 'examples/cpp' && 'ubuntu-22.04' || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
-      matrix:
-        folder: ${{ fromJson(needs.list-examples.outputs.format-matrix) }}
+      matrix: ${{ fromJson(needs.list-examples.outputs.format-matrix) }}
     steps:
       - uses: actions/checkout@v6
       - uses: bazel-contrib/setup-bazel@f34d6a05eae3c24acab7fa54587492daeaeffdab # 0.19.2
@@ -93,8 +104,7 @@ jobs:
     runs-on: ${{ matrix.folder == 'examples/cpp' && 'ubuntu-22.04' || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
-      matrix:
-        folder: ${{ fromJson(needs.list-examples.outputs.format-matrix) }}
+      matrix: ${{ fromJson(needs.list-examples.outputs.format-matrix) }}
     steps:
       - uses: actions/checkout@v6
       - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
@@ -113,16 +123,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        folder: ${{ fromJson(needs.list-examples.outputs.test-matrix) }}
-        include:
-          - folder: format
-        exclude:
-          # FIXME: these are failing, diagnose.
-          - folder: examples/python
-          - folder: examples/cpp
-          - folder: examples/java
-          - folder: examples/shell
+      matrix: ${{ fromJson(needs.list-examples.outputs.test-matrix) }}
     steps:
       - uses: actions/checkout@v6
       # The lint_test.bats in each example shell out to `aspect lint`, so this
@@ -153,8 +154,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
-      matrix:
-        folder: ${{ fromJson(needs.list-examples.outputs.lint-matrix) }}
+      matrix: ${{ fromJson(needs.list-examples.outputs.lint-matrix) }}
     steps:
       - uses: actions/checkout@v6
       - uses: bazel-contrib/setup-bazel@f34d6a05eae3c24acab7fa54587492daeaeffdab # 0.19.2
@@ -188,8 +188,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
-      matrix:
-        folder: ${{ fromJson(needs.list-examples.outputs.lint-matrix) }}
+      matrix: ${{ fromJson(needs.list-examples.outputs.lint-matrix) }}
     steps:
       - uses: actions/checkout@v6
       - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
@@ -281,7 +280,17 @@ jobs:
   test-all:
     name: test-all
     runs-on: ubuntu-latest
-    needs: [format, format-aspect-cli, integration-test, lint, lint-aspect-cli, aspect-test, test, ty-integration]
+    needs:
+      [
+        format,
+        format-aspect-cli,
+        integration-test,
+        lint,
+        lint-aspect-cli,
+        aspect-test,
+        test,
+        ty-integration,
+      ]
     if: always()
     steps:
       - name: All required jobs succeeded

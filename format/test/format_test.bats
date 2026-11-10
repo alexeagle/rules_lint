@@ -270,3 +270,17 @@ setup() {
 
     assert_output --partial "+ modfmt -w examples/go-module/go.mod"
 }
+
+@test "should run nixfmt on Nix" {
+    run bazel run //format/test:format_Nix_with_nixfmt
+    assert_success
+
+    assert_output --partial "+ nixfmt examples/nix/src/hello.nix"
+}
+
+@test "should check Nix formatting with nixfmt" {
+    run bazel run //format/test:format_Nix_with_nixfmt.check
+    assert_success
+
+    assert_output --partial "+ nixfmt --check examples/nix/src/hello.nix"
+}

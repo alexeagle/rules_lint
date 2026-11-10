@@ -1,0 +1,13 @@
+{
+  "nixfmt": {
+    "binaries": [
+      {
+        "kind": "file",
+        "url": "https://github.com/NixOS/nixfmt/releases/download/v1.4.0/nixfmt",
+        "sha256": "62488394d5233283096466350487ed46470366f57db4bec824a87ecbacce960a",
+        "os": "linux",
+        "cpu": "x86_64"
+      }
+    ]
+  }
+}

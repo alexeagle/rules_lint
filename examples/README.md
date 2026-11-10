@@ -17,6 +17,7 @@ Each example includes a minimal working configuration for its supported tools. F
 | `keep-sorted/`      |                                                                               | keep-sorted                                 |
 | `kotlin/`           | ktfmt                                                                         | ktlint                                      |
 | `nodejs/`           | Prettier for JavaScript, TypeScript, Vue, CSS, Less, SCSS, HTML, and Markdown | ESLint, Stylelint, Vale                     |
+| `nix/`              | nixfmt                                                                        |                                             |
 | `other_formatters/` | cue fmt, Prettier, jsonnetfmt, djlint                                         |                                             |
 | `pkl/`              | pkl format                                                                    |                                             |
 | `protobuf/`         | Buf                                                                           | Buf                                         |

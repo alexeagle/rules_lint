@@ -109,6 +109,32 @@ tf=$(ls-files Terraform 'templated/{{ .X }}/file.tf' 2>/tmp/ls-files-stderr)
     exit 1
 }
 
+# Starlark includes arbitrary .bazel files but excludes generated lockfiles.
+mkdir -p starlark/nested
+touch starlark/foo.bazel starlark/foo.lock.bazel \
+    starlark/nested/BUILD.package.bazel starlark/nested/multitool.lock.bazel \
+    starlark/nested/source.bzl
+git add starlark
+touch starlark/nested/untracked.bazel starlark/nested/untracked.lock.bazel
+expected='starlark/foo.bazel
+starlark/nested/BUILD.package.bazel
+starlark/nested/source.bzl
+starlark/nested/untracked.bazel'
+for starlark in "$(ls-files Starlark | sort)" \
+    "$(ls-files Starlark starlark | sort)" \
+    "$(ls-files Starlark starlark/*.bazel starlark/nested/* | sort)" \
+    "$(disable_git_attribute_checks=true ls-files Starlark starlark | sort)"; do
+    [[ "$starlark" == "$expected" ]] || {
+        echo >&2 -e "expected Starlark files to be\n$expected, was\n$starlark"
+        exit 1
+    }
+done
+starlark=$(ls-files Starlark starlark/foo.lock.bazel)
+[[ -z "$starlark" ]] || {
+    echo >&2 "expected only lockfiles to produce no output, was $starlark"
+    exit 1
+}
+
 # sparse-checkout should be supported
 mkdir tree1 tree2
 touch tree1/src.js tree2/src.js

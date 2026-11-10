@@ -153,7 +153,7 @@ function ls-files {
       'SCSS') patterns=('*.scss') ;;
       'Scala') patterns=('*.scala' '*.kojo' '*.sbt' '*.sc') ;;
       'Shell') patterns=('.bash_aliases' '.bash_functions' '.bash_history' '.bash_logout' '.bash_profile' '.bashrc' '.cshrc' '.flaskenv' '.kshrc' '.login' '.profile' '.zlogin' '.zlogout' '.zprofile' '.zshenv' '.zshrc' '9fs' 'PKGBUILD' 'bash_aliases' 'bash_logout' 'bash_profile' 'bashrc' 'cshrc' 'gradlew' 'kshrc' 'login' 'man' 'profile' 'zlogin' 'zlogout' 'zprofile' 'zshenv' 'zshrc' '*.sh' '*.bash' '*.bats' '*.cgi' '*.command' '*.fcgi' '*.ksh' '*.sh.in' '*.tmux' '*.tool' '*.trigger' '*.zsh' '*.zsh-theme') ;;
-      'Starlark') patterns=('BUCK' 'BUILD' 'BUILD.bazel' 'MODULE.bazel' '*.MODULE.bazel' 'Tiltfile' 'WORKSPACE' 'WORKSPACE.bazel' '*.axl' '*.bzl' '*.star') ;;
+      'Starlark') patterns=('BUCK' 'BUILD' 'BUILD.bazel' '*.bazel' 'MODULE.bazel' '*.MODULE.bazel' 'Tiltfile' 'WORKSPACE' 'WORKSPACE.bazel' '*.axl' '*.bzl' '*.star') ;;
       'Swift') patterns=('*.swift') ;;
       'TSX') patterns=('*.tsx') ;;
       'TypeScript') patterns=('*.ts' '*.cts' '*.mts') ;;
@@ -177,6 +177,11 @@ function ls-files {
         ;;
     esac
 
+    exclusions=()
+    case "$language" in
+      'Starlark') exclusions=('*.lock.bazel') ;;
+    esac
+
     shebang_re=
     case "$language" in
       'Shell') shebang_re='^#![ \t]*/(usr/)?bin/(env[ \t]+)?(sh|bash|mksh|bats|zsh)(\s|$)' ;;
@@ -189,7 +194,11 @@ function ls-files {
 
         # TODO: determine which staged changes we should format; avoid formatting unstaged changes
         # TODO: try to format only modified regions of the file (where supported)
-        files=$(git ls-files -t --cached --modified --other --exclude-standard "${patterns[@]}" "${patterns[@]/#/*/}" | grep -v ^S | cut -f2- -d' ' | {
+        git_patterns=("${patterns[@]}" "${patterns[@]/#/*/}")
+        for (( i=0; i<${#exclusions[@]}; i++ )); do
+          git_patterns+=(":(exclude)${exclusions[$i]}")
+        done
+        files=$(git ls-files -t --cached --modified --other --exclude-standard "${git_patterns[@]}" | grep -v ^S | cut -f2- -d' ' | {
           grep -vFxf \
             <(git ls-files --deleted) \
           || true;
@@ -221,7 +230,11 @@ function ls-files {
           fi
           find_args+=("-name" "${patterns[$i]}")
         done
-        [ ${#patterns[@]} -ne 0 ] && find_args+=(')' "-print")
+        [ ${#patterns[@]} -ne 0 ] && find_args+=(')')
+        for (( i=0; i<${#exclusions[@]}; i++ )); do
+          find_args+=('!' '-name' "${exclusions[$i]}")
+        done
+        [ ${#patterns[@]} -ne 0 ] && find_args+=("-print")
         if [ -n "$shebang_re" ]; then
           [ ${#patterns[@]} -ne 0 ] && find_args+=('-or')
           find_args+=(

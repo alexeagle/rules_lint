@@ -29,6 +29,7 @@ oxlint_test = lint_test(aspect = oxlint)
 oxlint_typed = lint_oxlint_aspect(
     binary = Label("//tools/lint:oxlint"),
     config = Label("//src:oxlint-typed.json"),
+    mnemonic = "AspectRulesLintOxlintTyped",
     type_aware = True,
     tsgolint = Label("//tools/lint:tsgolint"),
 )

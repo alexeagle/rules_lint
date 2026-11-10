@@ -161,10 +161,11 @@ def oxlint_action(ctx, executable, srcs, config, stdout, exit_code = None, args 
             patch_out = patch,
             patch_cfg_env = env,
             tools = tools,
+            patch_cfg_suffix = ctx.attr._mnemonic + ".patch_cfg",
             max_fix_passes = 10,
             chdir = ctx.bin_dir.path,
             exit_code = exit_code,
-            mnemonic = _MNEMONIC,
+            mnemonic = ctx.attr._mnemonic,
             progress_message = "Fixing %{label} with Oxlint",
         )
         return
@@ -189,7 +190,7 @@ def oxlint_action(ctx, executable, srcs, config, stdout, exit_code = None, args 
         ),
         env = env,
         tools = tools,
-        mnemonic = _MNEMONIC,
+        mnemonic = ctx.attr._mnemonic,
         progress_message = "Linting %{label} with Oxlint",
     )
 
@@ -200,9 +201,9 @@ def _oxlint_aspect_impl(target, ctx):
 
     files_to_lint = filter_srcs(ctx.rule)
     if ctx.attr._options[LintOptionsInfo].fix:
-        outputs, info = patch_and_output_files(_MNEMONIC, target, ctx)
+        outputs, info = patch_and_output_files(ctx.attr._mnemonic, target, ctx)
     else:
-        outputs, info = output_files(_MNEMONIC, target, ctx)
+        outputs, info = output_files(ctx.attr._mnemonic, target, ctx)
 
     if len(files_to_lint) == 0:
         noop_lint_action(ctx, outputs)
@@ -222,7 +223,7 @@ def _oxlint_aspect_impl(target, ctx):
     )
 
     if ctx.attr._options[LintOptionsInfo].fix:
-        patch_exit_code = ctx.actions.declare_file(OUTFILE_FORMAT.format(label = target.label.name, mnemonic = _MNEMONIC, suffix = "patch.exit_code"))
+        patch_exit_code = ctx.actions.declare_file(OUTFILE_FORMAT.format(label = target.label.name, mnemonic = ctx.attr._mnemonic, suffix = "patch.exit_code"))
         oxlint_action(
             ctx,
             ctx.executable._oxlint_for_fix,
@@ -260,7 +261,8 @@ def lint_oxlint_aspect(
         type_aware = False,
         tsgolint = None,
         env = {},
-        fix_binary = None):
+        fix_binary = None,
+        mnemonic = _MNEMONIC):
     """Create an Oxlint aspect.
 
     Args:
@@ -275,6 +277,7 @@ def lint_oxlint_aspect(
         env: additional environment variables for Oxlint
         fix_binary: optional Oxlint executable for fixes; use a rules_js binary with
             patch_node_fs = False when JS configs/plugins follow shadow-tree symlinks
+        mnemonic: unique output name when multiple Oxlint configurations visit the same target
     """
     if type_aware and tsgolint == None:
         fail("type_aware requires a tsgolint executable")
@@ -301,6 +304,7 @@ def lint_oxlint_aspect(
             ),
             "_config_deps": attr.label_list(default = config_deps, allow_files = True),
             "_type_aware": attr.bool(default = type_aware),
+            "_mnemonic": attr.string(default = mnemonic),
             "_env": attr.string_dict(default = env),
             "_config_file": attr.label(
                 default = config,

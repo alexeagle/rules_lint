@@ -207,6 +207,32 @@ else
 fi
 
 #-------------------------------------------------------------------
+# Test 6: when the declared coreutils cannot create a scratch file, the
+# wrapper must fail the action instead of recording a clean-looking lint result.
+
+broken_coreutils="$tmp_dir/broken_coreutils"
+printf '#!/bin/sh\nexit 1\n' > "$broken_coreutils"
+chmod +x "$broken_coreutils"
+
+export MOCK_ARGS_FILE="$tmp_dir/args6.txt"
+export CLANG_TIDY__EXIT_CODE_OUTPUT_FILE="$tmp_dir/exit_code6.txt"
+export CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE="$tmp_dir/output6.txt"
+exit_code=0
+"$wrapper" "$broken_coreutils" "$mock_clang_tidy" qux.cpp > "$tmp_dir/stdout6.txt" 2>&1 || exit_code=$?
+unset CLANG_TIDY__EXIT_CODE_OUTPUT_FILE
+unset CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE
+
+if [[ $exit_code -eq 0 ]]; then
+    fail "wrapper succeeded although mktemp failed"
+elif [[ -f "$tmp_dir/exit_code6.txt" ]]; then
+    fail "a failed mktemp was recorded as a lint result"
+elif ! grep -q "mktemp failed" "$tmp_dir/stdout6.txt"; then
+    fail "no mktemp error message: $(cat "$tmp_dir/stdout6.txt")"
+else
+    pass "a failed mktemp fails the action instead of reporting clean"
+fi
+
+#-------------------------------------------------------------------
 
 # No host utilities may be reachable: exercise both captured and direct output.
 for capture in yes no fail; do

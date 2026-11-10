@@ -26,6 +26,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8
         with:
+          token: ${{ secrets.BCR_PUBLISH_TOKEN }}
           commit-message: "chore: mirror external releases"
-          author: "aspect-marvin <marvin@aspect.build>"
-          committer: "aspect-marvin <marvin@aspect.build>"
+          author: "bazel-contrib-bot <210917734+bazel-contrib-bot@users.noreply.github.com>"
+          committer: "bazel-contrib-bot <210917734+bazel-contrib-bot@users.noreply.github.com>"

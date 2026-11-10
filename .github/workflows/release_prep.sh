@@ -60,7 +60,7 @@ emit_changelog() {
 	echo
 
 	if [[ -n "$prev" ]]; then
-		echo "**Full Changelog**: https://github.com/aspect-build/rules_lint/compare/${prev}...${TAG}"
+		echo "**Full Changelog**: https://github.com/bazel-contrib/rules_lint/compare/${prev}...${TAG}"
 		echo
 	fi
 }
@@ -121,7 +121,7 @@ bazel_dep(name = "${MODULE_NAME}", version = "${MODULE_VERSION}")
 \`\`\`
 
 Then follow the setup instructions in
-https://github.com/aspect-build/rules_lint/blob/${TAG}/${SRC_MODULE_ROOT}/README.md
+https://github.com/bazel-contrib/rules_lint/blob/${TAG}/${SRC_MODULE_ROOT}/README.md
 EOF
 
 	# Changes under this module's subtree since the previous <prefix> tag.
@@ -226,7 +226,7 @@ Add this to your \`MODULE.aspect\` file:
 # AXL dependencies; see https://github.com/aspect-extensions
 axl_archive_dep(
     name = "rules_lint",
-    urls = ["https://github.com/aspect-build/rules_lint/releases/download/${TAG}/rules_lint-${TAG}.tar.gz"],
+    urls = ["https://github.com/bazel-contrib/rules_lint/releases/download/${TAG}/rules_lint-${TAG}.tar.gz"],
     integrity = "${INTEGRITY}",
     strip_prefix = "rules_lint-${TAG:1}",
     dev = True,
@@ -235,8 +235,8 @@ axl_archive_dep(
 \`\`\`
 
 Then, follow the install instructions for
-- linting: https://github.com/aspect-build/rules_lint/blob/${TAG}/docs/linting.md
-- formatting: https://github.com/aspect-build/rules_lint/blob/${TAG}/docs/formatting.md
+- linting: https://github.com/bazel-contrib/rules_lint/blob/${TAG}/docs/linting.md
+- formatting: https://github.com/bazel-contrib/rules_lint/blob/${TAG}/docs/formatting.md
 
 [Aspect CLI]: https://docs.aspect.build/cli
 EOF

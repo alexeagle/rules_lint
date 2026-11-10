@@ -43,7 +43,11 @@ jobs:
       tag_prefix: ${{ inputs.tag_prefix }}
       module_roots: ${{ inputs.module_roots }}
       # GitHub repository which is a fork of the upstream where the Pull Request will be opened.
-      registry_fork: aspect-forks/bazel-central-registry
+      registry_fork: bazel-contrib-bot/bazel-central-registry
+      author_name: bazel-contrib-bot
+      author_email: 210917734+bazel-contrib-bot@users.noreply.github.com
+      committer_name: bazel-contrib-bot
+      committer_email: 210917734+bazel-contrib-bot@users.noreply.github.com
     permissions:
       attestations: write
       contents: write

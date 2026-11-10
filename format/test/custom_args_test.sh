@@ -43,4 +43,9 @@ check_flags "format_with_custom_args_Kotlin_with_ktfmt.check.bash" "--custom-che
 # Test default arguments used when no custom specified
 check_flags "format_with_custom_args_Java_with_java-format.check.bash" "--set-exit-if-changed --dry-run" "Java check mode uses default arguments"
 
+check_flags "format_Ruby_with_stree.bash" "write" "Ruby fix mode uses stree defaults"
+check_flags "format_Ruby_with_stree.check.bash" "check" "Ruby check mode uses stree defaults"
+check_flags "format_with_custom_args_Ruby_with_stree.bash" "write --print-width=80" "Ruby fix mode has custom arguments"
+check_flags "format_with_custom_args_Ruby_with_stree.check.bash" "check --print-width=80" "Ruby check mode has custom arguments"
+
 echo "All custom arguments tests passed!"

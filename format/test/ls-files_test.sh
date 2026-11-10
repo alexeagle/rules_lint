@@ -109,6 +109,19 @@ tf=$(ls-files Terraform 'templated/{{ .X }}/file.tf' 2>/tmp/ls-files-stderr)
     exit 1
 }
 
+# Ruby selects .rb and .rake files, including nested files.
+# Extensionless Ruby filenames and other Ruby dialects remain excluded.
+mkdir -p ruby/nested
+touch ruby/nested/source.rb ruby/task.rake ruby/Rakefile ruby/Gemfile ruby/types.rbs
+expected='ruby/nested/source.rb
+ruby/task.rake'
+for ruby in "$(ls-files Ruby | sort)" "$(ls-files Ruby ruby | sort)"; do
+    [[ "$ruby" == "$expected" ]] || {
+        echo >&2 -e "expected Ruby files to be\n$expected, was\n$ruby"
+        exit 1
+    }
+done
+
 # sparse-checkout should be supported
 mkdir tree1 tree2
 touch tree1/src.js tree2/src.js

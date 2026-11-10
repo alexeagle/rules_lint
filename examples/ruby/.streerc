@@ -1,0 +1,3 @@
+# Project style belongs here, rather than in rules_lint's default arguments.
+--print-width=100
+--plugins=plugin/trailing_comma

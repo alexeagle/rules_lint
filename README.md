@@ -154,7 +154,7 @@ Linters which are not language-specific:
 | Protocol Buffer    | [buf]                     | [buf lint]                                              |
 | Python             | [ruff]                    | [bandit], [flake8], [pydoclint], [pylint], [ruff], [ty] |
 | QML                | [qmlformat]               | [qmllint]                                               |
-| Ruby               |                           | [RuboCop], [StandardRB][standard]                       |
+| Ruby               | [Syntax Tree][stree]       | [RuboCop], [StandardRB][standard]                       |
 | Rust               | [rustfmt]                 | [clippy]                                                |
 | SQL                | [prettier-plugin-sql]     |                                                         |
 | Scala              | [scalafmt]                | [scalafix]                                              |
@@ -217,6 +217,7 @@ Linters which are not language-specific:
 [yamllint]: https://yamllint.readthedocs.io/en/stable/
 [psscriptanalyzer]: https://github.com/PowerShell/PSScriptAnalyzer
 [rustfmt]: https://rust-lang.github.io/rustfmt
+[stree]: https://github.com/ruby-syntax-tree/syntax_tree
 [stylelint]: https://stylelint.io
 [clippy]: https://github.com/rust-lang/rust-clippy
 [scalafix]: https://scalacenter.github.io/scalafix/

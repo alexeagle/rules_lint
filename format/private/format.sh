@@ -148,6 +148,7 @@ function ls-files {
       'Python') patterns=('.gclient' 'DEPS' 'SConscript' 'SConstruct' 'wscript' '*.py' '*.cgi' '*.fcgi' '*.gyp' '*.gypi' '*.lmi' '*.py3' '*.pyde' '*.pyi' '*.pyp' '*.pyt' '*.pyw' '*.rpy' '*.spec' '*.tac' '*.wsgi' '*.xpy') ;;
       # GitHub Linguist also groups .qbs with QML, but qmlformat only supports .qml files.
       'QML') patterns=('*.qml') ;;
+      'Ruby') patterns=('*.rake' '*.rb') ;;
       'Rust') patterns=('*.rs' '*.rs.in') ;;
       'SQL') patterns=('*.sql' '*.cql' '*.ddl' '*.inc' '*.mysql' '*.prc' '*.tab' '*.udf' '*.viw') ;;
       'SCSS') patterns=('*.scss') ;;

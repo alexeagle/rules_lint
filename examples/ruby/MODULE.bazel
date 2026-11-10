@@ -2,6 +2,14 @@
 
 bazel_dep(name = "rules_lint")
 bazel_dep(name = "rules_ruby", version = "0.21.1")
+
+# rules_ruby 0.21.1 does not expose gem patches through bundle_fetch.
+single_version_override(
+    module_name = "rules_ruby",
+    patch_strip = 1,
+    patches = ["//tools/format:rules-ruby-gem-patches.patch"],
+)
+
 bazel_dep(name = "bazel_skylib", version = "1.4.2")
 
 local_path_override(
@@ -42,6 +50,20 @@ ruby.bundle_fetch(
     gemfile = "//:Gemfile",
     gemfile_lock = "//:Gemfile.lock",
 )
-use_repo(ruby, "bundle", "ruby", "ruby_toolchains")
+
+# Keep the formatter independent of the larger lint bundle.
+ruby.bundle_fetch(
+    name = "stree_bundle",
+    gem_checksums = {
+        "prettier_print-1.2.1": "a72838b5f23facff21f90a5423cdcdda19e4271092b41f4ea7f50b83929e6ff9",
+        "syntax_tree-6.2.0": "a50a01c246601af3c258edbb6b12e44373d17966ab3bebd1f7224b3b994a343d",
+    },
+    gemfile = "//tools/format:Gemfile",
+    gemfile_lock = "//tools/format:Gemfile.lock",
+    patches = {
+        "syntax_tree-6.2.0": "//tools/format:syntax-tree-cli.patch",
+    },
+)
+use_repo(ruby, "bundle", "ruby", "ruby_toolchains", "stree_bundle")
 
 register_toolchains("@ruby_toolchains//:all")

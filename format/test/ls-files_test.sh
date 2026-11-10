@@ -65,6 +65,31 @@ gen3.js'
     exit 1
 }
 
+# Without attribute checks, a modified file is listed once, and a path with a
+# space stays one path.
+touch "with space.go"
+echo "package p" >more.go
+go=$(disable_git_attribute_checks=true ls-files Go | LC_ALL=C sort)
+expected='more.go
+src.go
+with space.go'
+[[ "$go" == "$expected" ]] || {
+    echo >&2 -e "expected ls-files to return more.go, src.go and 'with space.go' once each, was\n$go"
+    exit 1
+}
+git checkout more.go
+rm "with space.go"
+
+# Without attribute checks, a shell script found only by its shebang is listed
+# alone, with no blank line for the empty pattern matches before it.
+printf '#!/usr/bin/env bash\necho hello\n' >script
+sh=$(disable_git_attribute_checks=true ls-files Shell)
+[[ "$sh" == "script" ]] || {
+    echo >&2 -e "expected ls-files to return only script, was\n$(printf '%q\n' "$sh")"
+    exit 1
+}
+rm script
+
 # deleted files should be ignored
 git rm src.css
 css=$(ls-files CSS)

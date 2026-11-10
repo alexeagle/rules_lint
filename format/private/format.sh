@@ -237,10 +237,10 @@ function ls-files {
     fi
 
     if [[ ${disable_git_attribute_checks:-} == true ]]; then
-      # files should be returned newline separated to avoid a "File name too long" error
-      for file in $files; do
-        echo "$file"
-      done
+      # One path per line, as the attribute check below returns them. git
+      # ls-files lists a modified file twice, and the shebang search adds a
+      # blank line when no file matched a pattern, so drop both.
+      [ -z "$files" ] || awk 'length($0) > 0 && !seen[$0]++' <<< "$files"
       return
     fi
 

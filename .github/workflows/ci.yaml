@@ -275,3 +275,28 @@ jobs:
       - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
       - name: Test Python type-only dependencies
         run: examples/python/test/ty_compatibility.sh "${{ matrix.rules-python }}" --test_output=errors
+
+  # Single stable check name for branch protection: the matrix job names above
+  # change whenever an example is added or removed, so main requires only this.
+  test-all:
+    name: test-all
+    runs-on: ubuntu-latest
+    needs: [format, format-aspect-cli, integration-test, lint, lint-aspect-cli, aspect-test, test, ty-integration]
+    if: always()
+    steps:
+      - name: All required jobs succeeded
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          names=$(jq -r 'keys[]' <<<"${NEEDS}")
+          [ -n "${names}" ]
+          status=0
+          for name in ${names}; do
+              result=$(jq -r --arg n "${name}" '.[$n].result' <<<"${NEEDS}")
+              if [ "${result}" != "success" ]; then
+                  echo "Required job did not succeed: ${name}=${result}"
+                  status=1
+              fi
+          done
+          exit "${status}"

@@ -3,7 +3,7 @@
 # buildifier: disable=bzl-visibility
 load("@rules_lint//lint/private:machine_report_testing.bzl", "report_test")  # @unused: used in commented-out tests
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
 load(
     "//tools/lint:linters.bzl",
     "bandit_test",
@@ -21,6 +21,7 @@ load(
     "machine_pylint_report",
     "machine_ruff_report",
     "machine_ty_report",
+    "ty_human_report",
 )
 
 write_file(
@@ -186,6 +187,11 @@ ty_test(
 )
 
 ty_test(
+    name = "ty_should_resolve_transitive_pyi_deps",
+    srcs = ["//src:uses_dependency_via_transitive_pyi_deps"],
+)
+
+ty_test(
     name = "ty_should_fail_unsupported_operator",
     srcs = ["//src:unsupported_operator"],
     expected_exit_code = 1,
@@ -294,4 +300,44 @@ report_test(
     expected_tool = "Pydoclint",
     expected_uri = "src/missing_doc_arg.py",
     report = "machine_pydoclint_report",
+)
+
+py_library(
+    name = "type_only_negative",
+    srcs = ["type_only_negative.py"],
+    deps = ["//src:uses_dependency_via_pyi_deps"],
+)
+
+ty_human_report(
+    name = "type_only_negative_report",
+    src = ":type_only_negative",
+)
+
+py_test(
+    name = "ty_type_only_test",
+    srcs = ["ty_type_only_test.py"],
+    args = ["$(locations :type_only_negative_report)"],
+    data = [":type_only_negative_report"],
+    deps = ["//src:uses_dependency_via_transitive_pyi_deps"],
+)
+
+py_test(
+    name = "ty_example_runtime_test",
+    srcs = ["ty_type_only_test.py"],
+    args = ["runtime"],
+    main = "ty_type_only_test.py",
+    deps = ["//src:uses_dependency_correctly"],
+)
+
+test_suite(
+    name = "ty_compatibility_tests",
+    tests = [
+        ":ty_example_runtime_test",
+        ":ty_should_fail_unsupported_operator",
+        ":ty_should_resolve_pyi_deps",
+        ":ty_should_resolve_transitive_pyi_deps",
+        ":ty_should_resolve_workspace_dep_with_imports",
+        ":ty_should_scope_materialized_command",
+        ":ty_type_only_test",
+    ],
 )

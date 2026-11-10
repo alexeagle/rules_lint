@@ -261,3 +261,17 @@ jobs:
         env:
           USE_BAZEL_VERSION: ${{ matrix.version }}
         run: bazel test //...
+
+  ty-integration:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rules-python: [pinned, 2.5.0-rc0]
+    env:
+      USE_BAZEL_VERSION: "8.x"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
+      - name: Test Python type-only dependencies
+        run: examples/python/test/ty_compatibility.sh "${{ matrix.rules-python }}" --test_output=errors

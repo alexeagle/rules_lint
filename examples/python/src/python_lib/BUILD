@@ -11,4 +11,5 @@ py_library(
     name = "py_dependency",
     srcs = ["dependency.py"],
     imports = ["."],
+    pyi_srcs = ["stub.pyi"],
 )

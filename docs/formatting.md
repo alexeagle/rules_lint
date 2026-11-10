@@ -68,6 +68,24 @@ indent_style = space
 indent_size = 4
 ```
 
+### Ruby (Syntax Tree)
+
+Supply a stree executable target with `ruby = ":stree"`. The default arguments
+are `check` for checking and `write` for fixing. File discovery selects `.rb` and
+`.rake` files.
+
+Users can supply a `.streerc` in their working directory to configure options such
+as print width, trailing commas, and ignored files:
+
+```text
+--print-width=100
+--plugins=plugin/trailing_comma
+--ignore-files=*.generated.rb
+```
+
+See the [Ruby example](../examples/ruby) for a pinned gem bundle, executable target,
+and the CLI patch needed to resolve workspace paths and skip symlink inputs.
+
 ### Custom formatter arguments
 
 You can override the default command-line arguments passed to formatters by specifying custom arguments for each language and mode:

@@ -60,6 +60,7 @@ format_multirun(
     protocol_buffer = ":mock_buf.sh",
     python = ":mock_ruff.sh",
     qml = ":mock_qmlformat.sh",
+    ruby = ":mock_stree.sh",
     rust = ":mock_rustfmt.sh",
     scala = ":mock_scalafmt.sh",
     shell = ":mock_shfmt.sh",
@@ -86,15 +87,22 @@ format_multirun(
         "--custom-fix",
         "--flag",
     ],
+    ruby = ":mock_stree.sh",
+    ruby_check_args = ["check", "--print-width=80"],
+    ruby_fix_args = ["write", "--print-width=80"],
 )
 
 sh_test(
     name = "custom_args_test",
     srcs = ["custom_args_test.sh"],
     data = [
+        ":format_Ruby_with_stree",
+        ":format_Ruby_with_stree.check",
         ":format_with_custom_args_Java_with_java-format.check",
         ":format_with_custom_args_Kotlin_with_ktfmt",
         ":format_with_custom_args_Kotlin_with_ktfmt.check",
+        ":format_with_custom_args_Ruby_with_stree",
+        ":format_with_custom_args_Ruby_with_stree.check",
     ],
     deps = ["@bazel_tools//tools/bash/runfiles"],
 )

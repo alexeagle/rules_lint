@@ -121,6 +121,10 @@ def run_patcher(
         "arguments": arguments,
         "env": final_env,
         "tools": tools,
+        # Workaround for the rules_js launcher's undeclared mktemp dependency (#547).
+        # Honor --action_env until that launcher supplies its own utilities.
+        # Explicit env values still take precedence.
+        "use_default_shell_env": True,
     }
     if mnemonic != None:
         kwargs["mnemonic"] = mnemonic

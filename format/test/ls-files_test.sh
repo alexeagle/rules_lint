@@ -65,6 +65,48 @@ gen3.js'
     exit 1
 }
 
+# Without attribute checks, a modified file is listed once, and a path with a
+# space stays one path.
+touch "with space.go"
+echo "package p" >more.go
+go=$(disable_git_attribute_checks=true ls-files Go | LC_ALL=C sort)
+expected='more.go
+src.go
+with space.go'
+[[ "$go" == "$expected" ]] || {
+    echo >&2 -e "expected ls-files to return more.go, src.go and 'with space.go' once each, was\n$go"
+    exit 1
+}
+git checkout more.go
+rm "with space.go"
+
+# Without attribute checks, a shell script found only by its shebang is listed
+# alone, with no blank line for the empty pattern matches before it.
+printf '#!/usr/bin/env bash\necho hello\n' >script
+sh=$(disable_git_attribute_checks=true ls-files Shell)
+[[ "$sh" == "script" ]] || {
+    echo >&2 -e "expected ls-files to return only script, was\n$(printf '%q\n' "$sh")"
+    exit 1
+}
+rm script
+
+# Extensionless shell scripts are found by their shebang under a dot-directory
+# too, with or without path arguments. A file with an extension is not.
+mkdir .hooks
+printf '#!/usr/bin/env bash\necho hello\n' >.hooks/pre-commit
+cp .hooks/pre-commit .hooks/notes.txt
+sh=$(ls-files Shell)
+[[ "$sh" == ".hooks/pre-commit" ]] || {
+    echo >&2 -e "expected ls-files to return .hooks/pre-commit, was\n$sh"
+    exit 1
+}
+sh=$(ls-files Shell .hooks)
+[[ "$sh" == ".hooks/pre-commit" ]] || {
+    echo >&2 -e "expected ls-files .hooks to return .hooks/pre-commit, was\n$sh"
+    exit 1
+}
+rm -r .hooks
+
 # deleted files should be ignored
 git rm src.css
 css=$(ls-files CSS)
@@ -108,6 +150,19 @@ tf=$(ls-files Terraform 'templated/{{ .X }}/file.tf' 2>/tmp/ls-files-stderr)
     echo >&2 -e "expected no stderr from ls-files, was\n$(cat /tmp/ls-files-stderr)"
     exit 1
 }
+
+# Ruby selects .rb and .rake files, including nested files.
+# Extensionless Ruby filenames and other Ruby dialects remain excluded.
+mkdir -p ruby/nested
+touch ruby/nested/source.rb ruby/task.rake ruby/Rakefile ruby/Gemfile ruby/types.rbs
+expected='ruby/nested/source.rb
+ruby/task.rake'
+for ruby in "$(ls-files Ruby | sort)" "$(ls-files Ruby ruby | sort)"; do
+    [[ "$ruby" == "$expected" ]] || {
+        echo >&2 -e "expected Ruby files to be\n$expected, was\n$ruby"
+        exit 1
+    }
+done
 
 # sparse-checkout should be supported
 mkdir tree1 tree2

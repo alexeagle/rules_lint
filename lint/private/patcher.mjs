@@ -21,7 +21,7 @@ function debug(...kwargs) {
 // assumes there are no recursive symlinks
 async function sync(src, dst, subdir, filesToDiff) {
   const files = (await fs.promises.readdir(path.join(src, subdir))).map((f) =>
-    path.join(subdir, f)
+    path.join(subdir, f),
   );
   for (const f of files) {
     const srcF = path.join(src, f);
@@ -70,13 +70,13 @@ async function main(args, sandbox) {
     process.cwd(),
     sandbox,
     ".",
-    config.files_to_diff.map((f) => path.join(sourcePrefix, f))
+    config.files_to_diff.map((f) => path.join(sourcePrefix, f)),
   );
 
   debug(
     `spawning linter: ${config.linter} ${spawnArgs.join(
-      " "
-    )} (with env ${JSON.stringify(config.env || {})})`
+      " ",
+    )} (with env ${JSON.stringify(config.env || {})})`,
   );
   const maxFixPasses = config.max_fix_passes || 1;
   // Oxlint applies one set of non-overlapping fixes per invocation. Hash only
@@ -87,7 +87,7 @@ async function main(args, sandbox) {
     const hash = crypto.createHash("sha256");
     for (const file of config.files_to_diff) {
       hash.update(
-        await fs.promises.readFile(path.join(sandbox, sourcePrefix, file))
+        await fs.promises.readFile(path.join(sandbox, sourcePrefix, file)),
       );
       hash.update("\0");
     }
@@ -104,7 +104,7 @@ async function main(args, sandbox) {
     ret = childProcess.spawnSync(linter, spawnArgs, {
       stdio: "inherit",
       cwd: path.join(sandbox, config.chdir || "."),
-      env: config.env || {},
+      env: Object.assign({}, process.env, config.env || {}),
     });
     if (ret.error) {
       throw ret.error;
@@ -118,7 +118,7 @@ async function main(args, sandbox) {
     if (nextState === state) break;
     if (seenStates.has(nextState)) {
       console.error(
-        `Linter fixes entered a cycle after ${pass} passes; stopping`
+        `Linter fixes entered a cycle after ${pass} passes; stopping`,
       );
       break;
     }
@@ -126,7 +126,7 @@ async function main(args, sandbox) {
     state = nextState;
     if (pass === maxFixPasses) {
       console.error(
-        `Linter fixes did not converge after ${maxFixPasses} passes; stopping`
+        `Linter fixes did not converge after ${maxFixPasses} passes; stopping`,
       );
     }
   }
@@ -147,7 +147,7 @@ async function main(args, sandbox) {
       [`--label=a/${f}`, `--label=b/${f}`, "--unified", origF, newF],
       {
         encoding: "utf8",
-      }
+      },
     );
     debug(results.stdout);
     fs.writeSync(diffOut, results.stdout);
@@ -166,7 +166,7 @@ async function main(args, sandbox) {
   try {
     sandbox = path.join(
       await fs.promises.mkdtemp(path.join(os.tmpdir(), "rules_lint_patcher-")),
-      process.env.JS_BINARY__WORKSPACE
+      process.env.JS_BINARY__WORKSPACE,
     );
     // Propagate the exit code of the subprocess so the caller can interpret it.
     process.exitCode = await main(process.argv.slice(2), sandbox);
@@ -180,7 +180,7 @@ async function main(args, sandbox) {
       }
     } catch (e) {
       console.error(
-        `An error has occurred while removing the sandbox folder at ${sandbox}. Error: ${e}`
+        `An error has occurred while removing the sandbox folder at ${sandbox}. Error: ${e}`,
       );
     }
   }

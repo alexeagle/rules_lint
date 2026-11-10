@@ -27,23 +27,29 @@ if [[ ! -f "$wrapper" ]]; then
     exit 1
 fi
 
+coreutils="$(rlocation "$1")"
+run_wrapper() {
+    "$BASH" "$wrapper" "$coreutils" "$@"
+}
+
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
 
 # A recording mock for clang-tidy: writes each argument it receives on its
 # own line, then exits with MOCK_EXIT_CODE (default 0).
 mock_clang_tidy="$tmp_dir/mock-clang-tidy"
-cat > "$mock_clang_tidy" <<'EOF'
-#!/usr/bin/env bash
+printf '#!%s\n' "$BASH" > "$mock_clang_tidy"
+cat >> "$mock_clang_tidy" <<'EOF'
 printf '%s\n' "$@" > "$MOCK_ARGS_FILE"
 if [[ -n "${MOCK_OUTPUT_FILE:-}" ]]; then
-    cat "$MOCK_OUTPUT_FILE"
+    "$MOCK_COREUTILS" cat "$MOCK_OUTPUT_FILE"
 else
     echo "mock clang-tidy output"
 fi
 exit "${MOCK_EXIT_CODE:-0}"
 EOF
 chmod +x "$mock_clang_tidy"
+export MOCK_COREUTILS="$coreutils"
 
 failures=0
 
@@ -74,7 +80,7 @@ args=(
 
 export MOCK_ARGS_FILE="$tmp_dir/args1.txt"
 exit_code=0
-MOCK_EXIT_CODE=0 "$wrapper" "$mock_clang_tidy" "${args[@]}" > "$tmp_dir/stdout1.txt" 2>&1 || exit_code=$?
+MOCK_EXIT_CODE=0 run_wrapper "$mock_clang_tidy" "${args[@]}" > "$tmp_dir/stdout1.txt" 2>&1 || exit_code=$?
 
 if [[ $exit_code -ne 0 ]]; then
     fail "wrapper exited with $exit_code for metacharacter args (eval regression?):
@@ -95,7 +101,7 @@ fi
 
 export MOCK_ARGS_FILE="$tmp_dir/args2.txt"
 exit_code=0
-MOCK_EXIT_CODE=3 "$wrapper" "$mock_clang_tidy" "-DX=__attribute__((noreturn))" foo.cpp \
+MOCK_EXIT_CODE=3 run_wrapper "$mock_clang_tidy" "-DX=__attribute__((noreturn))" foo.cpp \
     > "$tmp_dir/stdout2.txt" 2>&1 || exit_code=$?
 
 if [[ $exit_code -eq 3 ]]; then
@@ -112,7 +118,7 @@ export MOCK_ARGS_FILE="$tmp_dir/args3.txt"
 export CLANG_TIDY__EXIT_CODE_OUTPUT_FILE="$tmp_dir/exit_code.txt"
 export CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE="$tmp_dir/output.txt"
 exit_code=0
-MOCK_EXIT_CODE=2 "$wrapper" "$mock_clang_tidy" "-DY=__attribute__((unused))" bar.cpp \
+MOCK_EXIT_CODE=2 run_wrapper "$mock_clang_tidy" "-DY=__attribute__((unused))" bar.cpp \
     > "$tmp_dir/stdout3.txt" 2>&1 || exit_code=$?
 unset CLANG_TIDY__EXIT_CODE_OUTPUT_FILE
 unset CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE
@@ -144,7 +150,7 @@ for code in 126 127; do
     export CLANG_TIDY__EXIT_CODE_OUTPUT_FILE="$tmp_dir/exit_code4_$code.txt"
     export CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE="$tmp_dir/output4_$code.txt"
     exit_code=0
-    MOCK_EXIT_CODE=$code "$wrapper" "$mock_clang_tidy" baz.cpp \
+    MOCK_EXIT_CODE=$code run_wrapper "$mock_clang_tidy" baz.cpp \
         > "$tmp_dir/stdout4_$code.txt" 2>&1 || exit_code=$?
     unset CLANG_TIDY__EXIT_CODE_OUTPUT_FILE
     unset CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE
@@ -180,7 +186,7 @@ export MOCK_ARGS_FILE="$tmp_dir/args5.txt"
 export CLANG_TIDY__EXIT_CODE_OUTPUT_FILE="$tmp_dir/exit_code5.txt"
 export CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE="$tmp_dir/output5.txt"
 MOCK_OUTPUT_FILE="$tmp_dir/colored_violation.txt" MOCK_EXIT_CODE=1 \
-    "$wrapper" "$mock_clang_tidy" --use-color foo.cpp > "$tmp_dir/stdout5.txt" 2>&1 || true
+    run_wrapper "$mock_clang_tidy" --use-color foo.cpp > "$tmp_dir/stdout5.txt" 2>&1 || true
 if grep -q "treated as error" "$tmp_dir/output5.txt"; then
     fail "colored summary line leaked into the report"
 elif ! grep -q "modernize-use-trailing-return-type" "$tmp_dir/output5.txt"; then
@@ -191,7 +197,7 @@ fi
 
 export CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE="$tmp_dir/output5_clean.txt"
 MOCK_OUTPUT_FILE="$tmp_dir/colored_clean.txt" MOCK_EXIT_CODE=0 \
-    "$wrapper" "$mock_clang_tidy" --use-color foo.cpp > "$tmp_dir/stdout5_clean.txt" 2>&1 || true
+    run_wrapper "$mock_clang_tidy" --use-color foo.cpp > "$tmp_dir/stdout5_clean.txt" 2>&1 || true
 unset CLANG_TIDY__EXIT_CODE_OUTPUT_FILE
 unset CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE
 if [[ -s "$tmp_dir/output5_clean.txt" ]]; then
@@ -201,6 +207,66 @@ else
 fi
 
 #-------------------------------------------------------------------
+# Test 6: when the declared coreutils cannot create a scratch file, the
+# wrapper must fail the action instead of recording a clean-looking lint result.
+
+broken_coreutils="$tmp_dir/broken_coreutils"
+printf '#!/bin/sh\nexit 1\n' > "$broken_coreutils"
+chmod +x "$broken_coreutils"
+
+export MOCK_ARGS_FILE="$tmp_dir/args6.txt"
+export CLANG_TIDY__EXIT_CODE_OUTPUT_FILE="$tmp_dir/exit_code6.txt"
+export CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE="$tmp_dir/output6.txt"
+exit_code=0
+"$wrapper" "$broken_coreutils" "$mock_clang_tidy" qux.cpp > "$tmp_dir/stdout6.txt" 2>&1 || exit_code=$?
+unset CLANG_TIDY__EXIT_CODE_OUTPUT_FILE
+unset CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE
+
+if [[ $exit_code -eq 0 ]]; then
+    fail "wrapper succeeded although mktemp failed"
+elif [[ -f "$tmp_dir/exit_code6.txt" ]]; then
+    fail "a failed mktemp was recorded as a lint result"
+elif ! grep -q "mktemp failed" "$tmp_dir/stdout6.txt"; then
+    fail "no mktemp error message: $(cat "$tmp_dir/stdout6.txt")"
+else
+    pass "a failed mktemp fails the action instead of reporting clean"
+fi
+
+#-------------------------------------------------------------------
+
+# No host utilities may be reachable: exercise both captured and direct output.
+for capture in yes no fail; do
+    export MOCK_ARGS_FILE="$tmp_dir/args_no_path_$capture.txt"
+    if [[ $capture != no ]]; then
+        export CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE="$tmp_dir/report_no_path.txt"
+    fi
+    if [[ $capture == yes ]]; then
+        export CLANG_TIDY__EXIT_CODE_OUTPUT_FILE="$tmp_dir/exit_no_path.txt"
+    fi
+    exit_code=0
+    PATH=/no-such-path MOCK_OUTPUT_FILE="$tmp_dir/colored_violation.txt" MOCK_EXIT_CODE=1 \
+        run_wrapper "$mock_clang_tidy" foo.cpp > "$tmp_dir/stdout_no_path_$capture.txt" 2>&1 || exit_code=$?
+    if [[ $capture == yes ]]; then
+        report="$tmp_dir/report_no_path.txt"
+        if [[ $exit_code != 0 || $(cat "$tmp_dir/exit_no_path.txt") != 1 ]]; then
+            fail "wrapper did not capture the linter exit code without PATH"
+        fi
+        unset CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE CLANG_TIDY__EXIT_CODE_OUTPUT_FILE
+    else
+        report="$tmp_dir/stdout_no_path_$capture.txt"
+        if [[ $exit_code != 1 ]]; then
+            fail "wrapper did not propagate the linter exit code without PATH"
+        fi
+    fi
+    if [[ $capture == fail ]]; then
+        unset CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE
+    fi
+    if ! grep -q "modernize-use-trailing-return-type" "$report" || grep -q "treated as error" "$report"; then
+        fail "wrapper lost diagnostics or retained summary lines without PATH ($capture)"
+    else
+        pass "wrapper works without host utilities on PATH ($capture)"
+    fi
+done
 
 if [[ $failures -ne 0 ]]; then
     echo "$failures test(s) failed" >&2

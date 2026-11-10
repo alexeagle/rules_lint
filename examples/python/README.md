@@ -45,3 +45,9 @@ The `src/` directory contains example Python files with intentional violations:
 - `.pylintrc` - Pylint configuration
 - `.flake8` - Flake8 configuration
 - `pyproject.toml` - Bandit, Pydoclint, and Ty configuration
+
+## Ty compatibility tests
+
+Run `test/ty_compatibility.sh pinned` or `USE_BAZEL_VERSION=8.x test/ty_compatibility.sh 2.5.0-rc0` from this directory. The RC uses a checksummed release archive through a temporary module override and requires `flag_alias`, which is unavailable in the repository's Bazel 7.6.0 pin. Both commands preserve `MODULE.bazel` and run `//test:ty_compatibility_tests`, which CI exercises with Bazel 8.
+
+The suite checks direct and transitive type-only imports, specific negative type diagnostics, and the ordinary example's runtime behavior. Both versions exclude stubs from runfiles. The selected rules_python 1.8.1 still includes `.py` files reached through `pyi_deps`. The RC must exclude those files and imports too.

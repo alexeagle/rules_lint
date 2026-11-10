@@ -193,9 +193,14 @@ def _ty_aspect_impl(target, ctx):
         if hasattr(ctx.rule.attr, attr_name):
             for dep in getattr(ctx.rule.attr, attr_name):
                 if PyInfo in dep:
-                    transitive_sources.append(dep[PyInfo].transitive_sources)
-                    transitive_sources.append(dep[PyInfo].transitive_pyi_files)
-                    imports = dep[PyInfo].imports.to_list()
+                    infos = [dep[PyInfo]]
+                    type_checking_info = getattr(dep[PyInfo], "type_checking_info", None)
+                    if type_checking_info != None:
+                        infos.append(type_checking_info)
+                    for info in infos:
+                        transitive_sources.append(info.transitive_sources)
+                        transitive_sources.append(info.transitive_pyi_files)
+                    imports = depset(transitive = [info.imports for info in infos]).to_list()
                     if imports:
                         for import_path in imports:
                             resolved = _resolve_import_path(import_path, ctx.workspace_name, ctx.bin_dir.path)

@@ -1,0 +1,6 @@
+# Enables import sorting, which depends on knowing which modules are first-party.
+# `src` is relative to this file; this resolves to the root of the workspace.
+src = ["../.."]
+
+[lint]
+extend-select = ["I"]

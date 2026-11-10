@@ -1,7 +1,7 @@
 "Bazel dependencies for Protobuf formatting and linting example"
 
 bazel_dep(name = "rules_lint")
-bazel_dep(name = "rules_proto", version = "6.0.0")
+bazel_dep(name = "rules_proto", version = "6.0.2")
 bazel_dep(name = "rules_buf", version = "0.5.2")
 
 local_path_override(

@@ -41,6 +41,7 @@ ruff = lint_ruff_aspect(
     configs = [
         Label("@//:pyproject.toml"),
         Label("@//src:ruff.toml"),
+        Label("@//src/first_party_imports:ruff.toml"),
         Label("@//src/subdir:ruff.toml"),
     ],
 )

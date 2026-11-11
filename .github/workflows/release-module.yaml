@@ -74,7 +74,7 @@ jobs:
     # version tag, not a commit SHA: slsa-verifier reads the builder ref from the
     # provenance and rejects a bare SHA ("unexpected ref type"), which breaks the
     # release-artifact attestations that BCR's presubmit verifies. Do not SHA-pin.
-    uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.6.0
+    uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.7.0
     with:
       prerelease: ${{ needs.tag.outputs.prerelease == 'true' }}
       tag_name: ${{ inputs.tag_name }}

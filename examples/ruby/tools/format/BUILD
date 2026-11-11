@@ -1,4 +1,4 @@
-load("@aspect_rules_lint//format:defs.bzl", "format_multirun")
+load("@rules_lint//format:defs.bzl", "format_multirun")
 load("@rules_ruby//ruby:defs.bzl", "rb_binary")
 
 package(default_visibility = ["//:__subpackages__"])

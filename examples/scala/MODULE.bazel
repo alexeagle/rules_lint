@@ -37,7 +37,7 @@ use_repo(maven, "maven")
 # version of its dependencies.
 maven.install(
     name = "maven_scalafix",
-    artifacts = ["ch.epfl.scala:scalafix-cli_2.13.18:0.14.7"],
+    artifacts = ["ch.epfl.scala:scalafix-cli_2.13.18:0.14.10"],
     fail_if_repin_required = True,
     lock_file = "@//:scalafix_maven_install.json",
     repositories = [

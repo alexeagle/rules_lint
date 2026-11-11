@@ -1,12 +1,12 @@
 "Bazel dependencies for Python formatting and linting example"
 
 bazel_dep(name = "rules_lint")
-bazel_dep(name = "aspect_rules_py", version = "1.8.4")
+bazel_dep(name = "aspect_rules_py", version = "1.13.0")
 bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "rules_python", version = "1.8.1")
 bazel_dep(name = "rules_uv", version = "0.88.0")
 bazel_dep(name = "ext_mod")
-bazel_dep(name = "abseil-py", version = "2.1.0")
+bazel_dep(name = "abseil-py", version = "2.4.0")
 
 
 local_path_override(

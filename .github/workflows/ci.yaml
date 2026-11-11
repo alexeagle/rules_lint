@@ -140,7 +140,7 @@ jobs:
           detik-install: "false"
           file-install: "false"
       - name: Setup bats helpers
-        uses: brokenpip3/setup-bats-libs@adb596631d41c8e1da2466833a66ed2c321a4157 # 0.0.3
+        uses: brokenpip3/setup-bats-libs@58d5e1356dcf06ab3baed48e7af240963478aa0e # 0.1.0
         with:
           support-path: /usr/lib/bats/bats-support
           support-version: "0.3.0"

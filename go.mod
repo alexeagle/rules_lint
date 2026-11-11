@@ -4,7 +4,7 @@ go 1.23.9
 
 require (
 	github.com/onsi/gomega v1.37.0
-	github.com/reviewdog/errorformat v0.0.0-20260918023459-3785ec08195e
+	github.com/reviewdog/errorformat v0.0.0-20261111071206-96826ccdd0bd
 )
 
 require (

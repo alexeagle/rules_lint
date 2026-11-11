@@ -6,7 +6,7 @@ module(
 )
 
 bazel_dep(name = "rules_lint")
-bazel_dep(name = "aspect_rules_js", version = "1.40.0")
+bazel_dep(name = "aspect_rules_js", version = "1.42.3")
 bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "rules_rust", version = "0.67.0")
 bazel_dep(name = "rules_shell", version = "0.6.1")

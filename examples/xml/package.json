@@ -1,7 +1,7 @@
 {
   "devDependencies": {
     "prettier": "^2.8.7",
-    "@prettier/plugin-xml": "^0.10.0"
+    "@prettier/plugin-xml": "^0.13.0"
   },
   "packageManager": "pnpm@10.5.2",
   "pnpm": {

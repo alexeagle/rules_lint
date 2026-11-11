@@ -1,7 +1,7 @@
 "Bazel dependencies for XML formatting example"
 
 bazel_dep(name = "rules_lint")
-bazel_dep(name = "aspect_rules_js", version = "2.0.0")
+bazel_dep(name = "aspect_rules_js", version = "2.9.3")
 
 local_path_override(
     module_name = "rules_lint",

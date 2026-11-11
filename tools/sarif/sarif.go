@@ -28,7 +28,6 @@ import (
 	"github.com/reviewdog/errorformat"
 	"github.com/reviewdog/errorformat/fmts"
 	"github.com/reviewdog/errorformat/writer"
-	"github.com/reviewdog/reviewdog/parser"
 )
 
 func mnemonicPrettyName(mnemonic string) string {
@@ -356,14 +355,4 @@ func scalafixDiffEntries(report string) []*errorformat.Entry {
 	}
 
 	return entries
-}
-
-func toSarifJson(sarifJsonString string) (sarifJson parser.SarifJson, err error) {
-	if sarifJsonString == "" {
-		return parser.SarifJson{}, nil
-	}
-
-	err = json.Unmarshal([]byte(sarifJsonString), &sarifJson)
-
-	return sarifJson, err
 }

@@ -132,9 +132,13 @@ jobs:
         with:
           aspect-api-token: ${{ secrets.ASPECT_CLOUD_API_TOKEN }}
       - name: Setup bats
-        uses: mig4/setup-bats@af9a00deb21b5d795cabfeaa8d9060410377686d # v1
+        uses: bats-core/bats-action@3566550e0f594451ac0f58fcbfdeca93aa29a45e # 4.1.0
         with:
           bats-version: "1.8.2"
+          support-install: "false"
+          assert-install: "false"
+          detik-install: "false"
+          file-install: "false"
       - name: Setup bats helpers
         uses: brokenpip3/setup-bats-libs@adb596631d41c8e1da2466833a66ed2c321a4157 # 0.0.3
         with:

@@ -38,6 +38,7 @@ TOOLS = {
     "C#": "csharpier",
     "Pkl": "pkl",
     "Go Module": "modfmt",
+    "Nix": "nixfmt",
 }
 
 # Provided to make install more convenient
@@ -77,6 +78,7 @@ CHECK_FLAGS = {
     "csharpier": "check",
     "pkl": "format --silent",
     "modfmt": "-c",
+    "nixfmt": "--check",
 }
 
 # Flags to pass each tool when running in default mode
@@ -112,6 +114,7 @@ FIX_FLAGS = {
     "csharpier": "format",
     "pkl": "format --write",
     "modfmt": "-w",
+    "nixfmt": "",
 }
 
 def to_attribute_name(lang):

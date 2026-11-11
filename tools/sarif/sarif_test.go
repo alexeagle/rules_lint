@@ -17,12 +17,49 @@
 package sarif
 
 import (
+	"encoding/json"
 	"io"
 	"strings"
 	"testing"
 
 	. "github.com/onsi/gomega"
 )
+
+// Decode only the SARIF fields asserted below. Keeping this in test code avoids
+// pulling a diagnostic parser and its Protobuf types into the converter.
+type sarifReport struct {
+	Runs []struct {
+		Tool struct {
+			Driver struct {
+				Name string `json:"name"`
+			} `json:"driver"`
+		} `json:"tool"`
+		Results []struct {
+			Level   string `json:"level"`
+			Message struct {
+				Text string `json:"text"`
+			} `json:"message"`
+			Locations []struct {
+				PhysicalLocation struct {
+					ArtifactLocation struct {
+						URI string `json:"uri"`
+					} `json:"artifactLocation"`
+					Region struct {
+						StartLine   int32 `json:"startLine"`
+						StartColumn int32 `json:"startColumn"`
+					} `json:"region"`
+				} `json:"physicalLocation"`
+			} `json:"locations"`
+		} `json:"results"`
+	} `json:"runs"`
+}
+
+func toSarifJson(sarifJsonString string) (report sarifReport, err error) {
+	if sarifJsonString != "" {
+		err = json.Unmarshal([]byte(sarifJsonString), &report)
+	}
+	return report, err
+}
 
 func TestSarif(t *testing.T) {
 	t.Run("processes clang tidy output -> sarif correctly", func(t *testing.T) {
@@ -46,8 +83,8 @@ func TestSarif(t *testing.T) {
 		g.Expect(sarifJson.Runs[0].Results[1].Message.Text).To(Equal("function is not thread safe [concurrency-mt-unsafe]"))
 		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.ArtifactLocation.URI).To(Equal("speller/announce/announce.cc"))
 		g.Expect(sarifJson.Runs[0].Results[1].Locations[0].PhysicalLocation.ArtifactLocation.URI).To(Equal("speller/announce/announce.cc"))
-		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Line).To(Equal(int32(19)))
-		g.Expect(sarifJson.Runs[0].Results[1].Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Line).To(Equal(int32(19)))
+		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.StartLine).To(Equal(int32(19)))
+		g.Expect(sarifJson.Runs[0].Results[1].Locations[0].PhysicalLocation.Region.StartLine).To(Equal(int32(19)))
 	})
 
 	t.Run("processes taplo output -> sarif correctly", func(t *testing.T) {
@@ -63,10 +100,11 @@ func TestSarif(t *testing.T) {
 		g.Expect(sarifJson.Runs[0].Results[1].Message.Text).To(Equal("conflicting keys"))
 		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.ArtifactLocation.URI).To(Equal("src/invalid.toml"))
 		g.Expect(sarifJson.Runs[0].Results[1].Locations[0].PhysicalLocation.ArtifactLocation.URI).To(Equal("src/bad.toml"))
-		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Line).To(Equal(int32(1)))
-		g.Expect(sarifJson.Runs[0].Results[1].Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Line).To(Equal(int32(3)))
-		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Column).To(Equal(int32(5)))
-		g.Expect(sarifJson.Runs[0].Results[1].Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Column).To(Equal(int32(0)))
+		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.StartLine).To(Equal(int32(1)))
+		g.Expect(sarifJson.Runs[0].Results[1].Locations[0].PhysicalLocation.Region.StartLine).To(Equal(int32(3)))
+		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.StartColumn).To(Equal(int32(5)))
+		// Assert SARIF's one-based column directly, without RDF normalization.
+		g.Expect(sarifJson.Runs[0].Results[1].Locations[0].PhysicalLocation.Region.StartColumn).To(Equal(int32(1)))
 	})
 
 	t.Run("processes pydoclint output -> sarif correctly", func(t *testing.T) {
@@ -81,7 +119,7 @@ func TestSarif(t *testing.T) {
 		g.Expect(sarifJson.Runs[0].Results[0].Message.Text).To(Equal("DOC101: Function `documented_add`: Docstring contains fewer arguments than in function signature."))
 		g.Expect(sarifJson.Runs[0].Results[1].Message.Text).To(ContainSubstring("DOC103:"))
 		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.ArtifactLocation.URI).To(Equal("src/missing_doc_arg.py"))
-		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Line).To(Equal(int32(4)))
+		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.StartLine).To(Equal(int32(4)))
 	})
 	t.Run("processes cppcheck text output -> sarif correctly", func(t *testing.T) {
 		g := NewGomegaWithT(t)
@@ -112,8 +150,8 @@ func TestSarif(t *testing.T) {
 		// HTML tag name
 		g.Expect(guideline.Message.Text).To(Equal("A public base class should declare a protected non-virtual destructor. [Required 15.0.1]"))
 		g.Expect(guideline.Locations[0].PhysicalLocation.ArtifactLocation.URI).To(Equal("src/base.h"))
-		g.Expect(guideline.Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Line).To(Equal(int32(38)))
-		g.Expect(guideline.Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Column).To(Equal(int32(19)))
+		g.Expect(guideline.Locations[0].PhysicalLocation.Region.StartLine).To(Equal(int32(38)))
+		g.Expect(guideline.Locations[0].PhysicalLocation.Region.StartColumn).To(Equal(int32(19)))
 
 		// a finding cppcheck did not map to a guideline keeps its severity and id
 		uninit := run.Results[1]
@@ -149,8 +187,8 @@ func TestSarif(t *testing.T) {
 		g.Expect(sarifJson.Runs[0].Results[0].Message.Text).To(Equal("File name 'hello.kt' should conform PascalCase (standard:filename)"))
 		g.Expect(sarifJson.Runs[0].Results[1].Message.Text).To(Equal("Wildcard import (standard:no-wildcard-imports)"))
 		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.ArtifactLocation.URI).To(Equal("src/hello.kt"))
-		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Line).To(Equal(int32(1)))
-		g.Expect(sarifJson.Runs[0].Results[1].Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Line).To(Equal(int32(2)))
+		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.StartLine).To(Equal(int32(1)))
+		g.Expect(sarifJson.Runs[0].Results[1].Locations[0].PhysicalLocation.Region.StartLine).To(Equal(int32(2)))
 	})
 
 	t.Run("processes scalafix diff output -> sarif correctly", func(t *testing.T) {
@@ -170,7 +208,7 @@ func TestSarif(t *testing.T) {
 		g.Expect(len(sarifJson.Runs[0].Results)).To(Equal(1))
 		g.Expect(sarifJson.Runs[0].Results[0].Message.Text).To(Equal("Scalafix rewrite suggested"))
 		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.ArtifactLocation.URI).To(Equal("src/semantic_test.scala"))
-		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.GetRdfRange().Start.Line).To(Equal(int32(2)))
+		g.Expect(sarifJson.Runs[0].Results[0].Locations[0].PhysicalLocation.Region.StartLine).To(Equal(int32(2)))
 	})
 
 	t.Run("determineRelativePath: converts Windows path separators to URI separators", func(t *testing.T) {

@@ -1,0 +1,13 @@
+"Bazel dependencies for the Nix formatting example"
+
+bazel_dep(name = "aspect_rules_lint")
+bazel_dep(name = "rules_multitool", version = "0.11.0")
+
+local_path_override(
+    module_name = "aspect_rules_lint",
+    path = "../..",
+)
+
+multitool = use_extension("@rules_multitool//multitool:extension.bzl", "multitool")
+multitool.hub(lockfile = "//tools:nixfmt.lock.json")
+use_repo(multitool, "multitool")

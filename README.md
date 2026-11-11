@@ -149,6 +149,7 @@ Linters which are not language-specific:
 | Jsonnet            | [jsonnetfmt]              |                                                         |
 | Kotlin             | [ktfmt]                   | [ktlint]                                                |
 | Markdown           | [Prettier]                | [Vale]                                                  |
+| Nix                | [nixfmt]                  |                                                         |
 | Pkl                | [pkl]                     |                                                         |
 | PowerShell         |                           | [PSScriptAnalyzer]                                      |
 | Protocol Buffer    | [buf]                     | [buf lint]                                              |
@@ -197,6 +198,7 @@ Linters which are not language-specific:
 [gofmt]: https://pkg.go.dev/cmd/gofmt
 [gofumpt]: https://github.com/mvdan/gofumpt
 [modfmt]: https://github.com/joshdk/modfmt
+[nixfmt]: https://github.com/NixOS/nixfmt
 [jsonnetfmt]: https://github.com/google/go-jsonnet
 [scalafmt]: https://scalameta.org/scalafmt
 [rubocop]: https://docs.rubocop.org/

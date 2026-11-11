@@ -38,11 +38,19 @@ This means that any usage of `@rules_lint` on your system will point to this fol
 
 ## Releasing
 
+Release publishing and mirror pull requests use the organization-level
+`BCR_PUBLISH_TOKEN` secret, owned by `bazel-contrib-bot`. This repository must
+have access to that secret. The token needs write access to
+`bazel-contrib-bot/bazel-central-registry` for BCR publishing and to this
+repository for mirror pull requests. BCR branches and pull request heads must
+both point to the bot's fork. Commit attribution is configured explicitly in
+the workflows; the token determines the pull request author.
+
 Releases are automated on a cron trigger.
 If you do nothing, eventually the newest commits will be released automatically. See .github/workflows/tag.yaml.
 
 To trigger a release where the new version can be determined automatically from the commit history, just navigate to
-https://github.com/aspect-build/rules_lint/actions/workflows/tag.yaml
+https://github.com/bazel-contrib/rules_lint/actions/workflows/tag.yaml
 and press the "Run workflow" button.
 
 If you need control over the next release version, for example when making a release candidate for a new major,

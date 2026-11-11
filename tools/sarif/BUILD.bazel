@@ -11,7 +11,6 @@ go_library(
         "@com_github_reviewdog_errorformat//:errorformat",
         "@com_github_reviewdog_errorformat//fmts",
         "@com_github_reviewdog_errorformat//writer",
-        "@com_github_reviewdog_reviewdog//parser",
     ],
 )
 

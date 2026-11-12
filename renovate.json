@@ -4,14 +4,19 @@
     ":dependencyDashboard",
     ":enablePreCommit",
     ":semanticPrefixFixDepsChoreOthers",
-    "group:monorepos",
-    "group:recommended",
     "replacements:all",
-    "workarounds:all"
+    "workarounds:all",
+    "group:all"
   ],
+  "timezone": "America/Los_Angeles",
+  "schedule": ["* 0-3 1,15 * *"],
+  "updateNotScheduled": false,
+  "rebaseWhen": "conflicted",
+  "prConcurrentLimit": 1,
+  "branchConcurrentLimit": 1,
   "packageRules": [
     {
-      "matchFiles": ["MODULE.bazel"],
+      "matchFileNames": ["MODULE.bazel"],
       "enabled": false
     }
   ]

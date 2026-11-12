@@ -210,7 +210,7 @@ jobs:
           key="lint-${folder//\//-}"
           aspect lint --task:name="$key" --strategy=soft -- //...
           aspect lint --task:name="$key-fix" --fix --strategy=soft -- //...
-  # Build & test the root workspace through `aspect test` on Linux across Bazel
+  # Build & test the root and Go workspaces through `aspect test` on Linux across Bazel
   # versions. Complements `test` below, which covers macOS via vanilla Bazel.
   aspect-test:
     name: aspect-test (${{ matrix.workspace.path }}, ${{ matrix.bazel.id }})
@@ -220,6 +220,7 @@ jobs:
       matrix:
         workspace:
           - { path: ".", slug: "root" }
+          - { path: "examples/go", slug: "go" }
         bazel:
           - { id: "bazel-7", version: "7.x", flags: "" }
           - { id: "bazel-8", version: "8.x", flags: "" }

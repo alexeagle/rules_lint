@@ -137,7 +137,7 @@ Linters which are not language-specific:
 | CUDA               | [clang-format]            |                                                         |
 | CSS, Less, SCSS    | [Prettier]                | [Stylelint]                                             |
 | F#                 | [Fantomas]                |                                                         |
-| Go                 | [gofmt] or [gofumpt]      |                                                         |
+| Go                 | [gofmt] or [gofumpt]      | [golangci-lint]                                         |
 | Go Module          | [modfmt]                  |                                                         |
 | Gherkin            | [prettier-plugin-gherkin] |                                                         |
 | GraphQL            | [Prettier]                |                                                         |
@@ -196,6 +196,7 @@ Linters which are not language-specific:
 [prettier/plugin-xml]: https://github.com/prettier/plugin-xml
 [gofmt]: https://pkg.go.dev/cmd/gofmt
 [gofumpt]: https://github.com/mvdan/gofumpt
+[golangci-lint]: https://golangci-lint.run/
 [modfmt]: https://github.com/joshdk/modfmt
 [nixfmt]: https://github.com/NixOS/nixfmt
 [jsonnetfmt]: https://github.com/google/go-jsonnet

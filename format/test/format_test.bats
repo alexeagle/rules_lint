@@ -170,7 +170,7 @@ setup() {
     run bazel run //format/test:format_Go_with_gofmt
     assert_success
 
-    assert_output --partial "+ gofmt -w examples/go/src/hello.go"
+    assert_output --partial "+ gofmt -w examples/go/src/greeting.go examples/go/src/hello.go"
 }
 
 @test "should run clang-format on C++" {

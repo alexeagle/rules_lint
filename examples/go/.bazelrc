@@ -2,3 +2,9 @@
 # `aspect setup bazelrc`; regenerate there, not here. %workspace% is this
 # example, so `../..` reaches the root the examples share.
 try-import %workspace%/../../.aspect/bazelrc
+
+build:lint --aspects=//tools/lint:linters.bzl%golangci_lint
+build:lint --output_groups=rules_lint_machine
+
+# Override the preset's lockfile_mode on CI since MODULE.bazel.lock isn't committed.
+common:ci --lockfile_mode=off

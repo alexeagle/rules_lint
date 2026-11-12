@@ -35,6 +35,9 @@ func mnemonicPrettyName(mnemonic string) string {
 }
 
 func ToSarifJsonString(label string, mnemonic string, report string) (sarifJsonString string, err error) {
+	if mnemonic == "AspectRulesLintGolangciLint" {
+		return normalizeGolangciSarif(report)
+	}
 	regex := regexp.MustCompile(`^{\s+"\$schema":.+sarif`)
 	// If it's already in SARIF format, just return it
 	if regex.Match([]byte(report)) {
@@ -355,4 +358,87 @@ func scalafixDiffEntries(report string) []*errorformat.Entry {
 	}
 
 	return entries
+}
+
+// normalizeGolangciSarif preserves the report's fields while making result URIs
+// portable across Bazel execroots. Invalid JSON must fail, not hide findings.
+func normalizeGolangciSarif(report string) (string, error) {
+	if strings.TrimSpace(report) == "" {
+		return `{"version":"2.1.0","$schema":"https://json.schemastore.org/sarif-2.1.0.json","runs":[]}`, nil
+	}
+	var doc map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(report), &doc); err != nil {
+		return "", fmt.Errorf("invalid golangci-lint SARIF: %w", err)
+	}
+	if doc == nil {
+		return "", fmt.Errorf("invalid golangci-lint SARIF: expected an object")
+	}
+	// Walk artifactLocation objects, including related locations, without
+	// dropping report fields.
+	var walk func(json.RawMessage) (json.RawMessage, error)
+	walk = func(raw json.RawMessage) (json.RawMessage, error) {
+		trimmed := bytes.TrimSpace(raw)
+		if len(trimmed) == 0 {
+			return raw, nil
+		}
+		if trimmed[0] == '{' {
+			var obj map[string]json.RawMessage
+			if err := json.Unmarshal(raw, &obj); err != nil {
+				return nil, err
+			}
+			for key, value := range obj {
+				if key == "artifactLocation" {
+					var art map[string]json.RawMessage
+					if err := json.Unmarshal(value, &art); err != nil {
+						return nil, err
+					}
+					if uriRaw, ok := art["uri"]; ok {
+						var uri string
+						if err := json.Unmarshal(uriRaw, &uri); err != nil {
+							return nil, err
+						}
+						uri = strings.TrimPrefix(uri, "file://")
+						if i := strings.Index(uri, "/execroot/"); i >= 0 {
+							rest := uri[i+len("/execroot/"):]
+							uri = rest
+							if j := strings.IndexByte(rest, '/'); j >= 0 {
+								uri = rest[j+1:]
+							}
+						} else {
+							uri = strings.TrimPrefix(uri, "./")
+						}
+						art["uri"], _ = json.Marshal(uri)
+					}
+					obj[key], _ = json.Marshal(art)
+				} else {
+					v, err := walk(value)
+					if err != nil {
+						return nil, err
+					}
+					obj[key] = v
+				}
+			}
+			return json.Marshal(obj)
+		}
+		if trimmed[0] == '[' {
+			var arr []json.RawMessage
+			if err := json.Unmarshal(raw, &arr); err != nil {
+				return nil, err
+			}
+			for i, value := range arr {
+				v, err := walk(value)
+				if err != nil {
+					return nil, err
+				}
+				arr[i] = v
+			}
+			return json.Marshal(arr)
+		}
+		return raw, nil
+	}
+	normalized, err := walk(json.RawMessage(report))
+	if err != nil {
+		return "", fmt.Errorf("invalid golangci-lint SARIF: %w", err)
+	}
+	return string(normalized), nil
 }

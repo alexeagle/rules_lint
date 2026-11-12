@@ -1,0 +1,13 @@
+version: "2"
+run:
+  tests: false
+linters:
+  default: none
+  enable:
+    - govet
+  settings:
+    govet:
+      disable-all: true
+      enable:
+        - printf
+        - bools

@@ -1,0 +1,7 @@
+"""Aspect CLI configuration."""
+
+def config(ctx: ConfigContext):
+    ctx.tasks["lint"].args.aspects = [
+        "//tools/lint:linters.bzl%golangci_lint",
+    ]
+    ctx.tasks["lint"].args.rules_lint_fix_flag = "@rules_lint//lint:fix"

@@ -1,0 +1,9 @@
+[
+  {
+    "rule": "govet",
+    "message": "printf: example.com/analyzerfacts/relay.Relay format %d has arg \"not-an-integer\" of wrong type string",
+    "uri": "test/analyzerfacts/consumer/consumer.go",
+    "line": 6,
+    "column": 21
+  }
+]

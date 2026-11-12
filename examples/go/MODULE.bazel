@@ -1,7 +1,9 @@
 "Bazel dependencies for Go formatting example"
 
 bazel_dep(name = "rules_lint")
-bazel_dep(name = "rules_go", version = "0.52.0")
+bazel_dep(name = "rules_go", version = "0.61.0")
+
+bazel_dep(name = "jq.bzl", version = "0.6.0", dev_dependency = True)
 
 local_path_override(
     module_name = "rules_lint",

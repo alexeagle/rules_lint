@@ -17,6 +17,7 @@ go_library(
 go_test(
     name = "sarif_test",
     srcs = [
+        "golangci_test.go",
         "sarif_test.go",
         "statics_test.go",
     ],

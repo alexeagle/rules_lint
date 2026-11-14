@@ -94,6 +94,10 @@ def ruff_action(ctx, executable, srcs, config, stdout, exit_code = None, env = {
         action_args.add("--fix")
         action_args.add_all(srcs)
 
+        # The patcher launcher suppresses stderr when it records the exit code.
+        # Include it in the human report so usage/configuration errors survive.
+        fix_stdout = ctx.actions.declare_file(stdout.basename + ".stdout", sibling = stdout)
+        fix_stderr = ctx.actions.declare_file(stdout.basename + ".stderr", sibling = stdout)
         run_patcher(
             ctx,
             ctx.executable,
@@ -104,11 +108,19 @@ def ruff_action(ctx, executable, srcs, config, stdout, exit_code = None, env = {
             patch_cfg_suffix = "{}patch_cfg".format(mnemonic + "." if mnemonic != _MNEMONIC else ""),
             patch_out = patch,
             tools = [executable],
-            stdout = stdout,
+            stdout = fix_stdout,
+            stderr = fix_stderr,
             exit_code = exit_code,
             env = env,
             mnemonic = ctx.attr._mnemonic,
             progress_message = "Fixing %{label} with Ruff",
+        )
+        ctx.actions.run_shell(
+            inputs = [fix_stdout, fix_stderr],
+            outputs = [stdout],
+            command = 'cat "$1" "$2" > "$3"',
+            arguments = [fix_stdout.path, fix_stderr.path, stdout.path],
+            mnemonic = "RuffFixReport",
         )
     else:
         # Use run_shell for lint mode
@@ -151,6 +163,7 @@ def _transitive_python_sources(ctx):
             for dep in getattr(ctx.rule.attr, attr_name):
                 if PyInfo in dep:
                     transitive.append(dep[PyInfo].transitive_sources)
+
                     # Older rules_python providers do not expose stub sources separately.
                     if hasattr(dep[PyInfo], "transitive_pyi_files"):
                         transitive.append(dep[PyInfo].transitive_pyi_files)

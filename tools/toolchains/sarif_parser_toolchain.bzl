@@ -110,6 +110,11 @@ toolchain(
     # Base BUILD file for this repository
     rctx.file("BUILD.bazel", build_content)
 
+    # Bazel <8.3.0 lacks rctx.repo_metadata.
+    if hasattr(rctx, "repo_metadata"):
+        return rctx.repo_metadata(reproducible = True)
+    return None
+
 sarif_parser_toolchains_repo = repository_rule(
     _sarif_parser_toolchains_repo_impl,
     doc = "Creates a repository with toolchain definitions for all known platforms which can be registered or selected.",

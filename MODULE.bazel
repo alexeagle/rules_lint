@@ -15,8 +15,8 @@ IS_RELEASE = False
 # see https://github.com/bazelbuild/bazel/pull/25509
 bazel_dep(name = "aspect_bazel_lib", version = "2.22.0", repo_name = None)
 
-# Force our dependents to a Bazel-9.0.1 compatible version of rules_nodejs
-bazel_dep(name = "rules_nodejs", version = "6.7.3", repo_name = None)
+# Require reproducible Node.js toolchain repositories for the repo contents cache.
+bazel_dep(name = "rules_nodejs", version = "6.7.4", repo_name = None)
 
 # Needed in the root because we use js_lib_helpers in our aspect impl
 # Minimum version needs 'chore: bump bazel-lib to 2.0 by @alexeagle in #1311'
@@ -41,7 +41,8 @@ bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "rules_python", version = "0.26.0")
 
 # Needed in the root because we dereference the toolchain in our aspect impl
-bazel_dep(name = "rules_buf", version = "0.5.2")
+# 0.5.4 marks checksum-pinned toolchain repositories as reproducible.
+bazel_dep(name = "rules_buf", version = "0.5.4")
 
 bazel_lib_toolchains = use_extension("@bazel_lib//lib:extensions.bzl", "toolchains")
 bazel_lib_toolchains.coreutils()

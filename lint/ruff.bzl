@@ -151,6 +151,7 @@ def _transitive_python_sources(ctx):
             for dep in getattr(ctx.rule.attr, attr_name):
                 if PyInfo in dep:
                     transitive.append(dep[PyInfo].transitive_sources)
+
                     # Older rules_python providers do not expose stub sources separately.
                     if hasattr(dep[PyInfo], "transitive_pyi_files"):
                         transitive.append(dep[PyInfo].transitive_pyi_files)
@@ -260,6 +261,11 @@ def _ruff_workaround_20269_impl(rctx):
     if result.return_code:
         fail("Couldn't extract ruff: \nSTDOUT:\n{}\nSTDERR:\n{}".format(result.out, result.stderr))
     rctx.file("BUILD", rctx.attr.build_file_content)
+
+    # Unpinned downloads may change; Bazel <8.3.0 lacks rctx.repo_metadata.
+    if rctx.attr.sha256 and hasattr(rctx, "repo_metadata"):
+        return rctx.repo_metadata(reproducible = True)
+    return None
 
 ruff_workaround_20269 = repository_rule(
     _ruff_workaround_20269_impl,

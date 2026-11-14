@@ -2,7 +2,7 @@
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-def _repos_impl(_mctx):
+def _repos_impl(mctx):
     http_archive(
         name = "pwsh",
         url = "https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz",
@@ -30,6 +30,8 @@ package(default_visibility = ["//visibility:public"])
 filegroup(name = "files", srcs = glob(["**"]))
 """,
     )
+
+    return mctx.extension_metadata(reproducible = True)
 
 repos = module_extension(
     implementation = _repos_impl,

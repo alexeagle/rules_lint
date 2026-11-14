@@ -1,7 +1,5 @@
 "Module extensions for use with bzlmod"
 
-load("@bazel_features//:features.bzl", "bazel_features")
-
 # buildifier: disable=bzl-visibility
 load("@bazel_lib//lib/private:extension_utils.bzl", "extension_utils")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file", "http_jar")
@@ -103,6 +101,8 @@ def _lint_extension_impl(mctx):
                     url = style["url"].format(style["version"]),
                 )
 
+    return mctx.extension_metadata(reproducible = True)
+
 tools = module_extension(
     implementation = _lint_extension_impl,
     tag_classes = {
@@ -125,9 +125,7 @@ def _toolchains_extension_impl(mctx):
         get_version_fn = lambda attr: None,
     )
 
-    if bazel_features.external_deps.extension_metadata_has_reproducible:
-        return mctx.extension_metadata(reproducible = True)
-    return mctx.extension_metadata()
+    return mctx.extension_metadata(reproducible = True)
 
 toolchains = module_extension(
     implementation = _toolchains_extension_impl,

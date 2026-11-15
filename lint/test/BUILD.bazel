@@ -1,9 +1,67 @@
 load("@bazel_lib//lib:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//lint/private:patcher_run.bzl", "patcher_run")
 load(":lint_test_no_report_test.bzl", "no_report_test", "skipped_lint_test")
 load(":lint_test_xml.bzl", "fake_lint_test")
 load(":patcher_env_test.bzl", "patcher_env_test")
+load(":ruff_fix_test.bzl", "ruff_fix_reports")
+
+# Simulate a Ruff configuration failure, including stdout to catch overwrites.
+write_file(
+    name = "ruff_failure",
+    out = "ruff_failure.sh",
+    content = [
+        "#!/usr/bin/env bash",
+        "echo 'ruff stdout'",
+        "echo 'ruff configuration error' >&2",
+        "exit 2",
+    ],
+    is_executable = True,
+)
+
+filegroup(
+    name = "ruff_source",
+    srcs = ["ruff_fix_test.sh"],
+    tags = ["lint-with-ruff"],
+)
+
+filegroup(
+    name = "ruff_empty",
+    tags = ["lint-with-ruff"],
+)
+
+ruff_fix_reports(
+    name = "ruff_failure_reports",
+    src = ":ruff_source",
+)
+
+ruff_fix_reports(
+    name = "ruff_empty_reports",
+    src = ":ruff_empty",
+)
+
+sh_test(
+    name = "ruff_fix_stderr_test",
+    size = "small",
+    srcs = ["ruff_fix_test.sh"],
+    args = [
+        "2",
+        "$(locations :ruff_failure_reports)",
+    ],
+    data = [":ruff_failure_reports"],
+)
+
+sh_test(
+    name = "ruff_fix_empty_test",
+    size = "small",
+    srcs = ["ruff_fix_test.sh"],
+    args = [
+        "0",
+        "$(locations :ruff_empty_reports)",
+    ],
+    data = [":ruff_empty_reports"],
+)
 
 sh_test(
     name = "clang_tidy_wrapper_test",

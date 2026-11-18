@@ -405,7 +405,16 @@ def _clang_tidy_aspect_impl(target, ctx):
 
         # TODO(alex): if we run with --fix, this will report the issues that were fixed. Does a machine reader want to know about them?
         raw_machine_report = ctx.actions.declare_file(OUTFILE_FORMAT.format(label = target.label.name + "_rules_lint/" + file.short_path, mnemonic = _MNEMONIC, suffix = "raw_machine_report"))
-        clang_tidy_action(ctx, compilation_context, ctx.executable, [file], raw_machine_report, output.machine.exit_code, args = ctx.attr._args)
+        if human_args == ctx.attr._args and not hasattr(output, "patch"):
+            # Identical invocations produce the same report and exit code. Reuse
+            # the human action through symlinks, including machine-only builds.
+            ctx.actions.symlink(output = raw_machine_report, target_file = output.human.out)
+            if output.machine.exit_code:
+                ctx.actions.symlink(output = output.machine.exit_code, target_file = output.human.exit_code)
+        else:
+            # Color and --fix change the human report; SARIF needs the original,
+            # uncolored diagnostics, so those invocations must stay separate.
+            clang_tidy_action(ctx, compilation_context, ctx.executable, [file], raw_machine_report, output.machine.exit_code, args = ctx.attr._args)
         parse_to_sarif_action(ctx, _MNEMONIC, raw_machine_report, output.machine.out)
     return [info]
 

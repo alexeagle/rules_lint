@@ -51,6 +51,20 @@ cc_binary(
     srcs = ["inconsistent_params.cpp"],
 )
 
+# Under a hermetic GCC toolchain, fails if clang-tidy picks up GCC's <immintrin.h>.
+cc_binary(
+    name = "gcc_headers_cc",
+    srcs = ["gcc_headers.cpp"],
+    # <immintrin.h> is x86 only.
+    target_compatible_with = ["@platforms//cpu:x86_64"],
+)
+
+clang_tidy_test(
+    name = "clang_tidy_gcc_headers",
+    srcs = [":gcc_headers_cc"],
+    expected_exit_code = 0,
+)
+
 # report_test(
 #     name = "cppcheck_machine_output_test",
 #     report = "machine_cppcheck_report",

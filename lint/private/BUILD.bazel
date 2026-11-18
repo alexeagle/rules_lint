@@ -11,6 +11,11 @@ bzl_library(
 )
 
 bzl_library(
+    name = "gcc_includes",
+    srcs = ["gcc_includes.bzl"],
+)
+
+bzl_library(
     name = "lint_aspect",
     srcs = ["lint_aspect.bzl"],
 )

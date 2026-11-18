@@ -44,6 +44,7 @@ load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_common")
 load("//lint/private:clang_tidy_flags.bzl", "update_flag")
 load("//lint/private:gcc_includes.bzl", "with_gcc_builtin_includes_last")
 load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "noop_lint_action", "output_files", "parse_to_sarif_action", "patch_and_output_files", "should_visit")
+load("//lint/private:macos_sdk.bzl", "macos_sysroot_args")
 load("//lint/private:patcher_action.bzl", "patcher_attrs", "run_patcher")
 
 _COREUTILS_TOOLCHAIN = Label("@bazel_lib//lib:coreutils_toolchain_type")
@@ -245,10 +246,12 @@ def _get_compiler_args(ctx, compilation_context, srcs):
     sources_are_cxx = _is_cxx(srcs[0])
     if (sources_are_cxx):
         user_flags = ctx.fragments.cpp.cxxopts + ctx.fragments.cpp.copts
-        args.extend(_safe_flags(ctx, _toolchain_flags(ctx, user_flags, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"])
+        flags = _toolchain_flags(ctx, user_flags, ACTION_NAMES.cpp_compile) + rule_flags
+        args.extend(_safe_flags(ctx, flags) + ["-xc++"])
     else:
         user_flags = ctx.fragments.cpp.copts
-        args.extend(_safe_flags(ctx, _toolchain_flags(ctx, user_flags, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"])
+        flags = _toolchain_flags(ctx, user_flags, ACTION_NAMES.c_compile) + rule_flags
+        args.extend(_safe_flags(ctx, flags) + ["-xc"])
 
     # add defines
     for define in compilation_context.defines.to_list():
@@ -268,6 +271,23 @@ def _get_compiler_args(ctx, compilation_context, srcs):
     args.extend(_prefixed(compilation_context.quote_includes.to_list(), "-iquote"))
     args.extend(_prefixed(compilation_context.system_includes.to_list(), _angle_includes_option(ctx)))
     args.extend(_prefixed(compilation_context.external_includes.to_list(), "-isystem"))
+
+    # clang-tidy runs as its own action, so a hermetic clang-tidy (e.g. from
+    # toolchains_llvm) resolves its own libc++/builtins by binary-relative
+    # search, but not the macOS SDK platform headers (wchar.h, stdlib.h,
+    # math.h) that libc++ pulls in via #include_next. Pass -isysroot at the SDK
+    # root so the frontend locates them, rather than injecting individual
+    # include dirs that risk mixing incompatible header versions
+    # (https://github.com/llvm/llvm-project/issues/63890).
+    # macOS-only. A sysroot that the toolchain, the command line or the target
+    # already pins wins; macos_sysroot_args has the rules. A caller of
+    # clang_tidy_action whose ctx has no `_macos_constraint` attribute gets no
+    # sysroot.
+    macos = getattr(ctx.attr, "_macos_constraint", None)
+    if macos != None and ctx.target_platform_has_constraint(macos[platform_common.ConstraintValueInfo]):
+        cc_toolchain = find_cpp_toolchain(ctx)
+        args.extend(macos_sysroot_args(flags, cc_toolchain.sysroot, cc_toolchain.built_in_include_directories))
+
     return args
 
 def clang_tidy_action(ctx, compilation_context, executable, srcs, stdout, exit_code, patch = None, args = []):
@@ -483,6 +503,7 @@ def lint_clang_tidy_aspect(
                 cfg = "exec",
             ),
             "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
+            "_macos_constraint": attr.label(default = Label("@platforms//os:macos")),
             "_windows_constraint": attr.label(default = Label("@platforms//os:windows")),
             "_rule_kinds": attr.string_list(
                 default = rule_kinds,

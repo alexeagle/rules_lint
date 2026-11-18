@@ -6,6 +6,7 @@ load(":clang_tidy_flags_test.bzl", "clang_tidy_flags_test_suite")
 load(":gcc_includes_test.bzl", "gcc_includes_test")
 load(":lint_test_no_report_test.bzl", "no_report_test", "skipped_lint_test")
 load(":lint_test_xml.bzl", "fake_lint_test")
+load(":macos_sdk_test.bzl", "macos_sdk_test_suite")
 load(":patcher_env_test.bzl", "patcher_env_test")
 load(":ruff_fix_test.bzl", "ruff_fix_reports")
 
@@ -64,6 +65,8 @@ sh_test(
     ],
     data = [":ruff_empty_reports"],
 )
+
+macos_sdk_test_suite(name = "macos_sdk_test")
 
 sh_test(
     name = "clang_tidy_wrapper_test",

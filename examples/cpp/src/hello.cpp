@@ -6,6 +6,11 @@
 #include <string>
 #include <vector>
 
+// Forward declaration with intentionally different parameter name
+// to trigger readability-inconsistent-declaration-parameter-name,
+// which .clang-tidy promotes to an error via WarningsAsErrors.
+int string_to_int(const char *str);
+
 // deliberately bad code to trigger clang-tidy warning
 int string_to_int(const char *num) { return atoi(num); }
 

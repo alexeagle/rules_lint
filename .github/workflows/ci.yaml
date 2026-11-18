@@ -265,6 +265,17 @@ jobs:
         env:
           USE_BAZEL_VERSION: ${{ matrix.version }}
         run: bazel test //...
+      - name: Test clang-tidy sysroot handling in examples/cpp
+        # The lint jobs pin examples/cpp to Bazel 8 (see their TODO), so only that matrix entry runs it.
+        if: matrix.version == '8.x'
+        working-directory: examples/cpp
+        env:
+          USE_BAZEL_VERSION: ${{ matrix.version }}
+        run: |
+          bazel test --test_output=errors //test:clang_tidy_stdlib
+          sdk="$(xcrun --show-sdk-path)"
+          bazel test --test_output=errors --copt=-isysroot --copt="$sdk" //test:clang_tidy_stdlib
+          bazel test --test_output=errors --copt="-isysroot$sdk" //test:clang_tidy_stdlib
 
   ty-integration:
     runs-on: ubuntu-latest

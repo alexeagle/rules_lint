@@ -20,6 +20,12 @@ clang_tidy_test(
     expected_exit_code = 1,
 )
 
+clang_tidy_test(
+    name = "clang_tidy_stdlib",
+    srcs = ["//src:stdlib_check"],
+    expected_exit_code = 0,
+)
+
 cppcheck_test(
     name = "cppcheck",
     srcs = ["//src:hello_cc"],

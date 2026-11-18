@@ -41,6 +41,7 @@ load("@bazel_skylib//rules/directory:providers.bzl", "DirectoryInfo")
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_common")
+load("//lint/private:clang_tidy_flags.bzl", "update_flag")
 load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "noop_lint_action", "output_files", "parse_to_sarif_action", "patch_and_output_files", "should_visit")
 load("//lint/private:patcher_action.bzl", "patcher_attrs", "run_patcher")
 
@@ -100,57 +101,20 @@ def _toolchain_flags(ctx, user_flags, action_name = ACTION_NAMES.cpp_compile):
     )
     return flags
 
-def _update_flag(flag):
-    # update from MSVC C++ standard to clang C++ standard
-    unsupported_flags = [
-        "-fno-canonical-system-headers",
-        "-fstack-usage",
-        "/nologo",
-        "/COMPILER_MSVC",
-        "/showIncludes",
-        "/experimental:external",
-    ]
-    unsupported_prefixes = [
-        "/wd",
-        "-W",
-        "/W",
-        "/external",
-    ]
-    if (flag in unsupported_flags):
-        return []
-    for prefix in unsupported_prefixes:
-        if flag.startswith(prefix):
-            return []
-
-    flags = [flag]
-
-    # remap MSVC flags to clang-style
-    if (flag.startswith("/std:")):
-        # remap c++ standard to clang
-        flags = ["-std=" + flag.removeprefix("/std:")]
-    elif (flag.startswith("/D")):
-        # remap defines
-        flags = ["-" + flag[1:]]
-    elif (flag.startswith("/FI")):
-        flags = ["-include", flag.removeprefix("/FI")]
-    elif (flag.startswith("/I")):
-        flags = ["-iquote", flag.removeprefix("/I")]
-    elif (flag in ["/MD", "/MDd", "/MT", "/MTd"]):
-        # mimic microsoft's behaviour and add a define
-        flags = ["-D_MT"]
-    elif (flag.startswith("/")):
-        # strip all other microsoft params
-        return []
-    return flags
-
 def _safe_flags(ctx, flags):
     # Some flags might be used by GCC/MSVC, but not understood by Clang.
     # Remap or remove them here, to allow users to run clang-tidy, without having
     # a clang toolchain configured (that would produce a good command line with --compiler clang)
     safe_flags = []
     skipped_flags = []
+
+    # MSVC-style options only come with a toolchain that targets Windows. A
+    # caller of clang_tidy_action whose ctx has no `_windows_constraint`
+    # attribute keeps the MSVC handling on every target.
+    windows = getattr(ctx.attr, "_windows_constraint", None)
+    msvc = windows == None or ctx.target_platform_has_constraint(windows[platform_common.ConstraintValueInfo])
     for flag in flags:
-        updated = _update_flag(flag)
+        updated = update_flag(flag, msvc)
         if (any(updated)):
             safe_flags.extend(updated)
         elif (ctx.attr._verbose):
@@ -518,6 +482,7 @@ def lint_clang_tidy_aspect(
                 cfg = "exec",
             ),
             "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
+            "_windows_constraint": attr.label(default = Label("@platforms//os:windows")),
             "_rule_kinds": attr.string_list(
                 default = rule_kinds,
             ),

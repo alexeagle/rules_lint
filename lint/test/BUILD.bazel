@@ -2,6 +2,7 @@ load("@bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//lint/private:patcher_run.bzl", "patcher_run")
+load(":clang_tidy_flags_test.bzl", "clang_tidy_flags_test_suite")
 load(":lint_test_no_report_test.bzl", "no_report_test", "skipped_lint_test")
 load(":lint_test_xml.bzl", "fake_lint_test")
 load(":patcher_env_test.bzl", "patcher_env_test")
@@ -149,3 +150,5 @@ diff_test(
     file1 = ":clang_tidy_fix.patch",
     file2 = "clang_tidy_fix.patch.expected",
 )
+
+clang_tidy_flags_test_suite(name = "clang_tidy_flags_test")

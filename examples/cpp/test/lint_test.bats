@@ -27,6 +27,7 @@ function assert_cpp_lints() {
 	refute_output --partial "warnings generated"
 	refute_output --partial "Suppressed"
 	refute_output --partial "Use -header-filter"
+	refute_output --partial "/execroot/"
 }
 
 @test "clang-tidy report strips the 'treated as error' summary" {
@@ -36,4 +37,5 @@ function assert_cpp_lints() {
 	assert_success
 	assert_output --partial "error:"
 	refute_output --partial "treated as error"
+	refute_output --partial "/execroot/"
 }

@@ -268,6 +268,36 @@ for capture in yes no fail; do
     fi
 done
 
+#-------------------------------------------------------------------
+# Test 7: absolute paths under the working directory are made relative, so the
+# report does not depend on the sandbox or execroot location.
+
+work_dir="$tmp_dir/exec.[root] with spaces"
+mkdir -p "$work_dir"
+printf '%s\n' \
+    "$work_dir/src/foo.cpp:1:5: warning: use a trailing return type [modernize-use-trailing-return-type]" \
+    "/usr/include/stdio.h:1:1: note: outside the working directory" \
+    "${work_dir}x/src/foo.cpp:2:1: note: sibling of the working directory" \
+    > "$tmp_dir/absolute_paths.txt"
+printf '%s\n' \
+    "src/foo.cpp:1:5: warning: use a trailing return type [modernize-use-trailing-return-type]" \
+    "/usr/include/stdio.h:1:1: note: outside the working directory" \
+    "${work_dir}x/src/foo.cpp:2:1: note: sibling of the working directory" \
+    > "$tmp_dir/expected7.txt"
+
+export MOCK_ARGS_FILE="$tmp_dir/args7.txt"
+export CLANG_TIDY__EXIT_CODE_OUTPUT_FILE="$tmp_dir/exit_code7.txt"
+export CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE="$tmp_dir/output7.txt"
+(cd "$work_dir" && MOCK_OUTPUT_FILE="$tmp_dir/absolute_paths.txt" MOCK_EXIT_CODE=1 \
+    run_wrapper "$mock_clang_tidy" src/foo.cpp) > "$tmp_dir/stdout7.txt" 2>&1 || true
+unset CLANG_TIDY__EXIT_CODE_OUTPUT_FILE
+unset CLANG_TIDY__STDOUT_STDERR_OUTPUT_FILE
+if diff -u "$tmp_dir/expected7.txt" "$tmp_dir/output7.txt"; then
+    pass "paths under the working directory are relative in the report"
+else
+    fail "report still depends on the working directory"
+fi
+
 if [[ $failures -ne 0 ]]; then
     echo "$failures test(s) failed" >&2
     exit 1

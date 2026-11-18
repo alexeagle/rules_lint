@@ -58,10 +58,15 @@ exit_code=$?
 sgr=$'(\033\\[[0-9;]*m)*'
 summary="^${sgr}([0-9]+ (warnings?|errors?)( and [0-9]+ errors?)? generated\.|Suppressed [0-9]+ warnings? \(.*\)\.|Use -header-filter=.*|[0-9]+ warnings? treated as errors?)${sgr}\$"
 # Bash can filter the report without adding a host grep dependency.
+# clang-tidy prints absolute paths; strip the working directory so the report
+# does not depend on the sandbox or execroot location.
+# Keep the slash in a variable: Bash 3.2 misparses it inside the quoted
+# substitution pattern, producing corrupt paths on macOS.
+cwd_prefix="$PWD/"
 if ! (
     while IFS= read -r line || [[ -n "$line" ]]; do
         if [[ ! "$line" =~ $summary ]]; then
-            printf '%s\n' "$line" || exit 1
+            printf '%s\n' "${line//"$cwd_prefix"/}" || exit 1
         fi
     done < "$raw_out_file"
 ) > "$out_file"; then

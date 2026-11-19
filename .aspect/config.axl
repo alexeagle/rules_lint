@@ -5,6 +5,7 @@ load("@aspect//feature/github_lint_comments.axl", "GithubLintComments")
 load("@aspect//feature/github_status_checks.axl", "GithubStatusChecks")
 load("@aspect//feature/github_status_comments.axl", "GithubStatusComments")
 load("@aspect//feature/tips.axl", "Tips")
+load("@aspect//feature/workflows.axl", "Workflows")
 load("@aspect//traits.axl", "BazelTrait")
 
 # Tips the App/id-token features emit when their credentials are absent.
@@ -55,12 +56,15 @@ def config(ctx: ConfigContext):
     # This repo's module is rules_lint, not aspect_rules_lint (the task's default).
     ctx.tasks["lint"].args.rules_lint_fix_flag = "@rules_lint//lint:fix"
 
-    # Fork PRs lack ASPECT_API_TOKEN and a usable OIDC token, so disable
-    # the features that depend on them (and silence the tips they would
-    # otherwise emit). The build/test itself is unaffected.
-    if _is_fork_ci(ctx):
+    # Fork PRs lack credentials; Buildkite uses its own reporting. Disable
+    # the hosted artifact/GitHub features in both cases and silence their tips.
+    if _is_fork_ci(ctx) or ctx.std.env.var("BUILDKITE"):
         ctx.features[ArtifactUpload].enabled = False
         ctx.features[GithubStatusChecks].enabled = False
         ctx.features[GithubStatusComments].enabled = False
         ctx.features[GithubLintComments].enabled = False
         ctx.features[Tips].args.silence = _FORK_UNACTIONABLE_TIPS
+
+    # Buildkite jobs use the CLI and rulesets without the Workflows product.
+    if ctx.std.env.var("BUILDKITE"):
+        ctx.features[Workflows].enabled = False

@@ -1,0 +1,4 @@
+# Installed as /etc/bazel.bazelrc in the CI image for all Bazel invocations.
+common --show_progress_rate_limit=60
+common --show_timestamps
+build:lint --no@rules_lint//lint:color

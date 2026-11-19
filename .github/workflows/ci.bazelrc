@@ -1,5 +1,5 @@
 # This file contains Bazel settings to apply on CI only.
-# It is referenced with a --bazelrc option in the call to bazel in ci.yaml
+# Referenced with --bazelrc by release.yml when building release artifacts.
 
 # Debug where options came from
 build --announce_rc

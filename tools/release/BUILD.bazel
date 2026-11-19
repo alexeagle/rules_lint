@@ -24,6 +24,7 @@ sh_binary(
         "//tools/release:gopackagesdriver",
         "//tools/release:sarif_parser",
     ],
+    tags = ["manual"],
     deps = ["@bazel_tools//tools/bash/runfiles"],
 )
 

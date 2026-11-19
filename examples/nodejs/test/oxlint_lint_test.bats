@@ -29,10 +29,10 @@ bats_load_library "bats-assert"
         //src/oxlint_typed:typed
     assert_success
 
-    run cat bazel-bin/src/oxlint_typed/typed.AspectRulesLintOxlint.out
+    run cat bazel-bin/src/oxlint_typed/typed.AspectRulesLintOxlintTyped.out
     assert_output --partial "no-floating-promises"
-    run cat bazel-bin/src/oxlint_typed/typed.AspectRulesLintOxlint.out.exit_code
+    run cat bazel-bin/src/oxlint_typed/typed.AspectRulesLintOxlintTyped.out.exit_code
     assert_output "1"
-    run cat bazel-bin/src/oxlint_typed/typed.AspectRulesLintOxlint.report
+    run cat bazel-bin/src/oxlint_typed/typed.AspectRulesLintOxlintTyped.report
     assert_output --partial "no-floating-promises"
 }

@@ -235,6 +235,9 @@ jobs:
       - name: Test
         working-directory: ${{ matrix.workspace.path }}
         run: aspect test --task:name=test-${{ matrix.workspace.slug }}-${{ matrix.bazel.id }} ${{ matrix.bazel.flags }} -- //...
+      - name: Test published Go tools
+        if: matrix.workspace.path == '.'
+        run: tools/release/test_go_prebuilts.sh
   test:
     strategy:
       matrix:
@@ -276,6 +279,11 @@ jobs:
           sdk="$(xcrun --show-sdk-path)"
           bazel test --test_output=errors --copt=-isysroot --copt="$sdk" //test:clang_tidy_stdlib
           bazel test --test_output=errors --copt="-isysroot$sdk" //test:clang_tidy_stdlib
+
+      - name: Test published Go tools
+        env:
+          USE_BAZEL_VERSION: ${{ matrix.version }}
+        run: tools/release/test_go_prebuilts.sh
 
   ty-integration:
     runs-on: ubuntu-latest

@@ -12,3 +12,14 @@ bzl_library(
         "//tools:version",
     ],
 )
+
+toolchain_type(name = "gopackagesdriver_toolchain_type")
+
+bzl_library(
+    name = "gopackagesdriver_toolchain",
+    srcs = ["gopackagesdriver_toolchain.bzl"],
+    deps = [
+        "//tools:integrity",
+        "//tools:version",
+    ],
+)

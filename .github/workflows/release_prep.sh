@@ -178,25 +178,22 @@ RELEASED_BINARY_INTEGRITY = $(
 )
 EOF
 
-# Fail the release if any sarif_parser platform the toolchain requires is missing
-# an integrity entry. A dropped or unbuilt release binary otherwise yields an
-# incomplete RELEASED_BINARY_INTEGRITY that publishes without error; the gap only
-# surfaces later in a consuming repo at `bazel build` time as
-# "key \"sarif_parser-<platform>\" not found in dictionary".
-# The required platforms are the keys of SARIF_PARSER_PLATFORMS.
+# Each published toolchain needs a checksummed binary for every execution platform.
 missing=()
-for platform in $(grep -oE '^    "[a-z0-9_]+": struct\(' tools/toolchains/sarif_parser_toolchain.bzl | sed -E 's/^    "([^"]+)".*/\1/'); do
-  ext=""
-  [[ "$platform" == windows_* ]] && ext=".exe"
-  key="sarif_parser-${platform}${ext}"
-  if ! grep -q "\"${key}\"" ${PREFIX}/tools/integrity.bzl; then
-    missing+=("$key")
-  fi
+for tool in sarif_parser gopackagesdriver; do
+  for platform in $(grep -oE '^    "[a-z0-9_]+": struct\(' "tools/toolchains/${tool}_toolchain.bzl" | sed -E 's/^    "([^"]+)".*/\1/'); do
+    ext=""
+    [[ "$platform" == windows_* ]] && ext=".exe"
+    key="${tool}-${platform}${ext}"
+    if ! grep -q "\"${key}\"" ${PREFIX}/tools/integrity.bzl; then
+      missing+=("$key")
+    fi
+  done
 done
 if [[ ${#missing[@]} -gt 0 ]]; then
   echo "ERROR: release integrity is missing entries for: ${missing[*]}" >&2
   echo "The go-binaries/ artifact did not contain a .sha256 for every required" >&2
-  echo "sarif_parser platform. Aborting to avoid publishing a broken release." >&2
+  echo "toolchain platform. Aborting to avoid publishing a broken release." >&2
   echo "Generated tools/integrity.bzl was:" >&2
   cat ${PREFIX}/tools/integrity.bzl >&2
   exit 1

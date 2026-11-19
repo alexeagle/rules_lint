@@ -5,7 +5,9 @@ load("@bazel_lib//lib/private:extension_utils.bzl", "extension_utils")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file", "http_jar")
 load(
     "//tools/toolchains:register.bzl",
+    "DEFAULT_GOPACKAGESDRIVER_REPOSITORY",
     "DEFAULT_SARIF_PARSER_REPOSITORY",
+    "register_gopackagesdriver_toolchains",
     "register_sarif_parser_toolchains",
 )
 load(":vale_library.bzl", "VALE_STYLE_DATA")
@@ -125,11 +127,20 @@ def _toolchains_extension_impl(mctx):
         get_version_fn = lambda attr: None,
     )
 
+    extension_utils.toolchain_repos_bfs(
+        mctx = mctx,
+        get_tag_fn = lambda tags: tags.gopackagesdriver,
+        toolchain_name = "gopackagesdriver",
+        toolchain_repos_fn = lambda name, version: register_gopackagesdriver_toolchains(name = name, register = False),
+        get_version_fn = lambda attr: None,
+    )
+
     return mctx.extension_metadata(reproducible = True)
 
 toolchains = module_extension(
     implementation = _toolchains_extension_impl,
     tag_classes = {
+        "gopackagesdriver": tag_class(attrs = {"name": attr.string(default = DEFAULT_GOPACKAGESDRIVER_REPOSITORY)}),
         "sarif_parser": tag_class(attrs = {"name": attr.string(default = DEFAULT_SARIF_PARSER_REPOSITORY)}),
     },
 )

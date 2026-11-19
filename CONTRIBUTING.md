@@ -63,3 +63,14 @@ then: tag the repo and push the tag, for example
 ```
 
 Then watch the automation run on GitHub actions which creates the release.
+
+The Go linter's release path can be tested without publishing artifacts:
+
+```shell
+tools/release/test_go_prebuilts.sh
+```
+
+This builds native release binaries, stages a downstream consumer with the BCR
+Go development-dependency patch applied, and runs the Go integration tests using
+checksummed binaries from a local distribution directory. It also checks that
+neither helper is built from source in the consumer.

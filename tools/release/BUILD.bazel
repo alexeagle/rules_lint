@@ -7,11 +7,23 @@ multi_platform_go_binaries(
     tags = ["manual"],
 )
 
+multi_platform_go_binaries(
+    name = "gopackagesdriver",
+    embed = ["//lint/private/gopackagesdriver_static:gopackagesdriver_static_lib"],
+    tags = ["manual"],
+)
+
 sh_binary(
     name = "copy_release_artifacts",
     srcs = ["copy_release_artifacts.sh"],
-    args = ["$(rlocationpaths //tools/release:sarif_parser)"],
-    data = ["//tools/release:sarif_parser"],
+    args = [
+        "$(rlocationpaths //tools/release:sarif_parser)",
+        "$(rlocationpaths //tools/release:gopackagesdriver)",
+    ],
+    data = [
+        "//tools/release:gopackagesdriver",
+        "//tools/release:sarif_parser",
+    ],
     deps = ["@bazel_tools//tools/bash/runfiles"],
 )
 

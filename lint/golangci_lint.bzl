@@ -21,7 +21,7 @@ shared module cache. Requires rules_go >= 0.61.0 for cgo test inputs.
 
 load("@io_bazel_rules_go//go/private:providers.bzl", "GoStdLib")
 load("@io_bazel_rules_go//go/tools/gopackagesdriver:aspect.bzl", "GoPkgInfo", "go_pkg_info_aspect")
-load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OUTFILE_FORMAT", "output_files", "should_visit")
+load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OUTFILE_FORMAT", "SARIF_PARSER_TOOLCHAIN", "output_files", "should_visit")
 
 _MNEMONIC = "AspectRulesLintGolangciLint"
 
@@ -29,6 +29,7 @@ _MNEMONIC = "AspectRulesLintGolangciLint"
 # time. Reached via ctx.toolchains[...] because the aspect declares it in
 # `toolchains` below.
 _GO_TOOLCHAIN = "@io_bazel_rules_go//go:toolchain"
+_DRIVER_TOOLCHAIN = Label("//tools/toolchains:gopackagesdriver_toolchain_type")
 
 def golangci_lint_action(ctx, executable, driver, pkg_info, sdk, stdlib, config, stdout, sarif, exit_code = None, options = [], mnemonic = _MNEMONIC):
     """Run golangci-lint hermetically against a single Go package.
@@ -177,6 +178,7 @@ def golangci_lint_action(ctx, executable, driver, pkg_info, sdk, stdlib, config,
         mnemonic = mnemonic,
         progress_message = "Linting %{label} with golangci-lint",
         tools = [executable, driver],
+        toolchain = _DRIVER_TOOLCHAIN,
     )
 
 def _normalize_sarif_action(ctx, raw_sarif, normalized_sarif):
@@ -207,7 +209,8 @@ def _normalize_sarif_action(ctx, raw_sarif, normalized_sarif):
     ctx.actions.run(
         inputs = [raw_sarif],
         outputs = [normalized_sarif],
-        executable = ctx.executable._sarif_parser,
+        executable = ctx.toolchains[SARIF_PARSER_TOOLCHAIN].sarif_parser_info.bin,
+        toolchain = SARIF_PARSER_TOOLCHAIN,
         arguments = [args],
         mnemonic = ctx.attr._mnemonic + "Sarif",
         progress_message = "Normalizing golangci-lint SARIF URIs for %{label}",
@@ -243,7 +246,7 @@ def _golangci_lint_aspect_impl(target, ctx):
     golangci_lint_action(
         ctx,
         ctx.executable._golangci_lint,
-        ctx.executable._driver,
+        ctx.toolchains[_DRIVER_TOOLCHAIN].gopackagesdriver_info.bin,
         pkg_info,
         sdk,
         stdlib,
@@ -290,16 +293,6 @@ def lint_golangci_lint_aspect(binary, config, rule_kinds = ["go_library", "go_bi
                 executable = True,
                 cfg = "exec",
             ),
-            "_driver": attr.label(
-                default = Label("//lint/private/gopackagesdriver_static:gopackagesdriver_static"),
-                executable = True,
-                cfg = "exec",
-            ),
-            "_sarif_parser": attr.label(
-                default = Label("//tools/sarif/cmd/sarif"),
-                executable = True,
-                cfg = "exec",
-            ),
             "_config_file": attr.label(
                 default = config,
                 allow_single_file = True,
@@ -312,5 +305,5 @@ def lint_golangci_lint_aspect(binary, config, rule_kinds = ["go_library", "go_bi
                 default = rule_kinds,
             ),
         },
-        toolchains = [_GO_TOOLCHAIN],
+        toolchains = [_GO_TOOLCHAIN, _DRIVER_TOOLCHAIN, SARIF_PARSER_TOOLCHAIN],
     )

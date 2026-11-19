@@ -40,3 +40,8 @@ whose name does not identify it as a printf wrapper. The expected diagnostic
 matches native golangci-lint 2.12.2, including its line and column. A deliberate
 `bools` finding in the dependency checks that dependency diagnostics stay out of
 the root report. The clean consumer checks the valid call too.
+
+Published releases download checksummed static package-driver and SARIF parser
+binaries for the execution platform. Development checkouts build these tools
+from source. rules_go remains required for Go providers, package metadata, and
+the SDK; Gazelle and the tools' Go module dependencies are development-only.

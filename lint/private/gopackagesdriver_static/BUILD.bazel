@@ -14,7 +14,7 @@ go_library(
         "utils.go",
     ],
     importpath = "github.com/aspect-build/rules_lint/lint/private/gopackagesdriver_static",
-    visibility = ["//visibility:private"],
+    visibility = ["//tools/release:__pkg__"],
     deps = ["@org_golang_x_tools//go/packages"],
 )
 
@@ -27,6 +27,9 @@ go_binary(
 go_test(
     name = "gopackagesdriver_static_test",
     srcs = ["main_test.go"],
-    data = glob(["testdata/**"], allow_empty = True),
+    data = glob(
+        ["testdata/**"],
+        allow_empty = True,
+    ),
     embed = [":gopackagesdriver_static_lib"],
 )

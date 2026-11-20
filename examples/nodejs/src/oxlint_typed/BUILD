@@ -11,6 +11,11 @@ ts_config(
 
 js_library(
     name = "oxlint_promise",
+    deps = [":oxlint_promise_types"],
+)
+
+js_library(
+    name = "oxlint_promise_types",
     srcs = ["promise.d.ts"],
 )
 

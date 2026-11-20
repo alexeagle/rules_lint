@@ -73,10 +73,11 @@ def _gather_inputs(ctx, target, srcs, config):
             dependencies.extend(dependency if type(dependency) == "list" else [dependency])
     dependencies.extend(getattr(ctx.rule.attr, "data", []))
 
-    files = [config]
-    for dependency in dependencies:
-        if JsInfo not in dependency:
-            files.extend(dependency.files.to_list())
+    transitive_inputs = [
+        dependency[DefaultInfo].files
+        for dependency in dependencies
+        if JsInfo not in dependency
+    ]
     if "gather_files_from_js_providers" in dir(js_lib_helpers):
         # rules_js 1.x
         js_files = js_lib_helpers.gather_files_from_js_providers(
@@ -95,30 +96,34 @@ def _gather_inputs(ctx, target, srcs, config):
             include_transitive_types = True,
             include_npm_sources = True,
         )
-    files.extend(js_files.to_list())
+    transitive_inputs.append(js_files)
 
-    # JS rules own copies in their packages. An aspect cannot copy a config
-    # from another package; standalone raw JSON configs can still be read from
-    # the execroot. Prefer the bin mirror when the config supplies JsInfo.
-    bin_files = {file.short_path: file for file in files if not file.is_source}
-
-    # Plain tsconfig/data files owned by the linted package also need mirrors
-    # beside the copied sources for TypeScript's config discovery.
-    local_files = [
+    # Inspect only direct inputs, never the transitive JS/npm input graph.
+    # JsInfo configs already supply bin-tree files; raw configs from another
+    # package can be read from the execroot without copying them.
+    local_files = {src: None for src in srcs}
+    for file in [config] + ctx.files._config_deps + [
         file
-        for file in files
-        if file.is_source and file.short_path not in bin_files and
-           file.owner.package == ctx.label.package and
-           file.owner.workspace_name == ctx.label.workspace_name
-    ]
-    copied = copy_or_reuse_bin_inputs(ctx, target, depset(srcs + local_files).to_list())
-    bin_files.update({file.short_path: file for file in copied})
-    return depset(copied + [bin_files.get(file.short_path, file) for file in files]).to_list()
+        for name in ["deps", "tsconfig", "extends", "package_json", "data"]
+        for file in getattr(ctx.rule.files, name, [])
+    ]:
+        if (file.is_source and
+            file.owner.package == ctx.label.package and
+            file.owner.workspace_name == ctx.label.workspace_name):
+            local_files[file] = None
+
+    copied = copy_or_reuse_bin_inputs(ctx, target, local_files.keys())
+    bin_files = {file.short_path: file for file in copied}
+    return struct(
+        files = depset([config] + copied, transitive = transitive_inputs),
+        config = bin_files.get(config.short_path, config),
+        srcs = [bin_files[src.short_path] for src in srcs],
+    )
 
 def _bin_relative(ctx, file):
     return relative_file(to_file = file.path, frm_file = ctx.bin_dir.path + "/_oxlint_anchor")
 
-def oxlint_action(ctx, executable, srcs, config, stdout, exit_code = None, args = [], format = None, patch = None, target = None):
+def oxlint_action(ctx, executable, srcs, config, stdout, exit_code = None, args = [], format = None, patch = None, target = None, prepared_inputs = None):
     """Run Oxlint as a Bazel action.
 
     Args:
@@ -132,19 +137,19 @@ def oxlint_action(ctx, executable, srcs, config, stdout, exit_code = None, args 
         format: optional Oxlint output format
         patch: optional output patch; when present, run Oxlint with `--fix`
         target: aspect target, used to reuse existing bin-tree copies
+        prepared_inputs: optional result of _gather_inputs, shared between report and fix actions
     """
-    inputs = _gather_inputs(ctx, target, srcs, config)
-    bin_files = {file.short_path: file for file in inputs}
+    inputs = prepared_inputs if prepared_inputs != None else _gather_inputs(ctx, target, srcs, config)
     action_args = ctx.actions.args()
     action_args.add_all(args)
-    action_args.add_all(["--config", _bin_relative(ctx, bin_files[config.short_path])])
+    action_args.add_all(["--config", _bin_relative(ctx, inputs.config)])
     if ctx.attr._type_aware:
         action_args.add("--type-aware")
     if format:
         action_args.add_all(["--format", format])
     if patch:
         action_args.add("--fix")
-    action_args.add_all([_bin_relative(ctx, bin_files[src.short_path]) for src in srcs])
+    action_args.add_all([_bin_relative(ctx, src) for src in inputs.srcs])
 
     env = dict(ctx.attr._env, BAZEL_BINDIR = ctx.bin_dir.path)
     tools = [executable]
@@ -155,7 +160,7 @@ def oxlint_action(ctx, executable, srcs, config, stdout, exit_code = None, args 
         run_patcher(
             ctx,
             ctx.executable,
-            inputs = inputs,
+            inputs = inputs.files,
             args = action_args,
             files_to_diff = [src.short_path for src in srcs],
             patch_out = patch,
@@ -178,7 +183,7 @@ def oxlint_action(ctx, executable, srcs, config, stdout, exit_code = None, args 
         command = '"$execroot"/{oxlint} "$@" >"$execroot"/{stdout} 2>&1'
 
     ctx.actions.run_shell(
-        inputs = inputs,
+        inputs = inputs.files,
         outputs = outputs,
         arguments = [action_args],
         # Set cwd explicitly so native binaries and rules_js launchers resolve
@@ -209,6 +214,8 @@ def _oxlint_aspect_impl(target, ctx):
         noop_lint_action(ctx, outputs)
         return [info]
 
+    inputs = _gather_inputs(ctx, target, files_to_lint, ctx.file._config_file)
+
     # Always report the original violations. Fixes are produced by a separate action so
     # `aspect lint` still exits non-zero when it offers an unapplied patch.
     oxlint_action(
@@ -219,7 +226,7 @@ def _oxlint_aspect_impl(target, ctx):
         outputs.human.out,
         outputs.human.exit_code,
         args = ctx.attr._args,
-        target = target,
+        prepared_inputs = inputs,
     )
 
     if ctx.attr._options[LintOptionsInfo].fix:
@@ -232,7 +239,7 @@ def _oxlint_aspect_impl(target, ctx):
             None,
             patch_exit_code,
             args = ctx.attr._args,
-            target = target,
+            prepared_inputs = inputs,
             patch = outputs.patch,
         )
 
@@ -245,7 +252,7 @@ def _oxlint_aspect_impl(target, ctx):
         outputs.machine.out,
         outputs.machine.exit_code,
         args = ctx.attr._args,
-        target = target,
+        prepared_inputs = inputs,
         format = "sarif",
     )
 

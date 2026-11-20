@@ -5,8 +5,24 @@ package(default_visibility = ["//visibility:public"])
 
 npm_link_all_packages(name = "node_modules")
 
+js_library(
+    name = "oxlint_config",
+    srcs = [".oxlintrc.json"],
+    deps = [":oxlint_config_deps"],
+)
+
+js_library(
+    name = "oxlint_config_deps",
+    srcs = [
+        "oxlint-base.json",
+        "oxlint-plugin.mjs",
+        "package.json",
+    ],
+)
+
 exports_files(
     [
+        ".oxlintrc.json",
         ".swcrc",
         ".vale.ini",
     ],

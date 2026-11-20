@@ -11,6 +11,7 @@ This example demonstrates how to set up formatting and linting for Node.js ecosy
 ### Linters
 
 - **ESLint** - JavaScript and TypeScript linter
+- **Oxlint** - JavaScript and TypeScript linter
 - **Stylelint** - CSS linter
 - **Vale** - Markdown linter
 
@@ -32,6 +33,8 @@ The `src/` directory contains example files with intentional violations:
 
 - `hello.js` - Simple JavaScript file
 - `file.ts`, `file-dep.ts` - TypeScript files with ESLint violations
+- `oxlint-fixable.ts` - Built-in and custom plugin violations requiring multiple fix passes
+- `oxlint_typed/` - Type-aware linting with inherited tsconfig paths and dependency declarations
 - `hello.tsx` - React TypeScript file
 - `hello.vue` - Vue component
 - `hello.css`, `clean.css` - CSS files (one with violations, one clean)
@@ -43,6 +46,7 @@ The `src/` directory contains example files with intentional violations:
 ## Configuration Files
 
 - `eslint.config.mjs` - ESLint configuration
+- `.oxlintrc.json` - Oxlint configuration
 - `stylelint.config.mjs` - Stylelint configuration
 - `.vale.ini` - Vale configuration for Markdown
 - `prettier.config.cjs` - Prettier configuration

@@ -17,7 +17,7 @@ BATS_EXCLUDED = {"examples/python", "examples/cpp", "examples/java", "examples/s
 BAZEL_8 = {
     "format": {"examples/csharp", "examples/fsharp", "examples/nodejs"},
     "lint": {"examples/cpp", "examples/kotlin", "examples/nodejs"},
-    "integration": {"examples/java", "examples/shell", "examples/kotlin", "format"},
+    "integration": {"examples/java", "examples/shell", "examples/kotlin", "examples/nodejs", "format"},
 }
 
 

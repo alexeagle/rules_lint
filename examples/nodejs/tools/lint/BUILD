@@ -8,11 +8,24 @@ load("@rules_lint//lint:vale_library.bzl", "VALE_STYLES")
 load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 load("@npm//:eslint/package_json.bzl", eslint_bin = "bin")
+load("@npm//:oxlint/package_json.bzl", oxlint_bin = "bin")
+load("@npm//:oxlint-tsgolint/package_json.bzl", tsgolint_bin = "bin")
 load("@npm//:stylelint/package_json.bzl", stylelint_bin = "bin")
 
 package(default_visibility = ["//:__subpackages__"])
 
 eslint_bin.eslint_binary(name = "eslint")
+
+oxlint_bin.oxlint_binary(name = "oxlint")
+
+# The patcher intentionally links dependencies from its writable shadow tree.
+# Node's filesystem patch rejects these links when loading JS configs/plugins.
+oxlint_bin.oxlint_binary(
+    name = "oxlint_for_fix",
+    patch_node_fs = False,
+)
+
+tsgolint_bin.tsgolint_binary(name = "tsgolint")
 
 stylelint_bin.stylelint_binary(name = "stylelint")
 

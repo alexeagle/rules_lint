@@ -2,6 +2,7 @@
 
 load("@rules_lint//lint:eslint.bzl", "lint_eslint_aspect")
 load("@rules_lint//lint:lint_test.bzl", "lint_test")
+load("@rules_lint//lint:oxlint.bzl", "lint_oxlint_aspect")
 load("@rules_lint//lint:stylelint.bzl", "lint_stylelint_aspect")
 load("@rules_lint//lint:vale.bzl", "lint_vale_aspect")
 
@@ -16,6 +17,24 @@ eslint = lint_eslint_aspect(
 )
 
 eslint_test = lint_test(aspect = eslint)
+
+oxlint = lint_oxlint_aspect(
+    binary = Label("//tools/lint:oxlint"),
+    config = Label("//:oxlint_config"),
+    fix_binary = Label("//tools/lint:oxlint_for_fix"),
+)
+
+oxlint_test = lint_test(aspect = oxlint)
+
+oxlint_typed = lint_oxlint_aspect(
+    binary = Label("//tools/lint:oxlint"),
+    config = Label("//src:oxlint-typed.json"),
+    mnemonic = "AspectRulesLintOxlintTyped",
+    type_aware = True,
+    tsgolint = Label("//tools/lint:tsgolint"),
+)
+
+oxlint_typed_test = lint_test(aspect = oxlint_typed)
 
 stylelint = lint_stylelint_aspect(
     binary = Label("//tools/lint:stylelint"),

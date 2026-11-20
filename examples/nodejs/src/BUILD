@@ -2,9 +2,11 @@ load("@rules_lint//format:defs.bzl", "format_test")
 load("@aspect_rules_swc//swc:defs.bzl", "swc")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
 load("@bazel_skylib//lib:partial.bzl", "partial")
-load("//tools/lint:linters.bzl", "eslint_test")
+load("//tools/lint:linters.bzl", "eslint_test", "oxlint_test")
 
 package(default_visibility = ["//visibility:public"])
+
+exports_files(["oxlint-typed.json"])
 
 ts_config(
     name = "tsconfig",
@@ -27,6 +29,18 @@ filegroup(
     name = "less",
     srcs = ["hello.less"],
     tags = ["lint-with-stylelint"],
+)
+
+filegroup(
+    name = "oxlint_fixable",
+    srcs = ["oxlint-fixable.ts"],
+    tags = ["lint-with-oxlint"],
+)
+
+oxlint_test(
+    name = "oxlint_fixable_test",
+    srcs = [":oxlint_fixable"],
+    expected_exit_code = 1,
 )
 
 filegroup(
@@ -76,6 +90,6 @@ format_test(
         "(special_char)/[square]/hello.md",
         "(special_char)/[square]/hello.ts",
     ],
-    javascript = ":prettier",
-    markdown = ":prettier",
+    javascript = "//tools/format:prettier",
+    markdown = "//tools/format:prettier",
 )

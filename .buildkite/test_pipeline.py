@@ -99,8 +99,7 @@ class PipelineTest(unittest.TestCase):
         self.assertEqual(pipeline.run(self.root, "examples/nodejs", ["format", "lint", "integration"]), 1)
         calls = self.calls()
         self.assertEqual(len(calls), 7)  # Includes checks after the seeded failure.
-        self.assertTrue(all(version == "8.x" for _, version in calls[:-1]))
-        self.assertEqual(calls[-1][1], "7.x")
+        self.assertTrue(all(version == "8.x" for _, version in calls))
         self.assertEqual((folder / "fixture").read_text(), "original")
 
     def test_root_tests_use_bazel_and_the_requested_version(self):

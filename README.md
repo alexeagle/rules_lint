@@ -145,7 +145,7 @@ Linters which are not language-specific:
 | HTML templates     | [djlint]                  |                                                         |
 | JSON, JSON5, JSONC | [Prettier]                |                                                         |
 | Java               | [google-java-format]      | [pmd], [Checkstyle], [SpotBugs]                         |
-| JavaScript         | [Prettier]                | [ESLint]                                                |
+| JavaScript         | [Prettier]                | [ESLint] or [Oxlint]                                    |
 | Jsonnet            | [jsonnetfmt]              |                                                         |
 | Kotlin             | [ktfmt]                   | [ktlint]                                                |
 | Markdown           | [Prettier]                | [Vale]                                                  |
@@ -164,8 +164,8 @@ Linters which are not language-specific:
 | Swift              | [SwiftFormat] (1)         |                                                         |
 | Terraform          | [terraform] fmt           |                                                         |
 | TOML               | [taplo]                   | [taplo]                                                 |
-| TSX                | [Prettier]                | [ESLint]                                                |
-| TypeScript         | [Prettier]                | [ESLint]                                                |
+| TSX                | [Prettier]                | [ESLint] or [Oxlint]                                    |
+| TypeScript         | [Prettier]                | [ESLint] or [Oxlint]                                    |
 | Vue                | [Prettier]                |                                                         |
 | YAML               | [yamlfmt]                 | [yamllint]                                              |
 | XML                | [prettier/plugin-xml]     |                                                         |
@@ -182,6 +182,7 @@ Linters which are not language-specific:
 [spotbugs]: https://spotbugs.github.io/
 [buf lint]: https://buf.build/docs/lint/overview
 [eslint]: https://eslint.org/
+[oxlint]: https://oxc.rs/docs/guide/usage/linter.html
 [swiftformat]: https://github.com/nicklockwood/SwiftFormat
 [terraform]: https://github.com/hashicorp/terraform
 [buf]: https://docs.buf.build/format/usage

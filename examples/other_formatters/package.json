@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "dependencies": {
     "prettier": "^3",
-    "prettier-plugin-gherkin": "^3"
+    "prettier-plugin-gherkin": "^4.0.0"
   },
-  "packageManager": "pnpm@10.5.2",
+  "packageManager": "pnpm@12.21.0",
   "pnpm": {
     "onlyBuiltDependencies": []
   }

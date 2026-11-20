@@ -16,7 +16,12 @@
   "branchConcurrentLimit": 1,
   "packageRules": [
     {
-      "matchFileNames": ["MODULE.bazel"],
+      "matchFileNames": [
+        "MODULE.bazel",
+        "lint/rules_rust/MODULE.bazel",
+        "lint/rust/MODULE.bazel",
+        "lint/scala/MODULE.bazel"
+      ],
       "enabled": false
     }
   ]

@@ -19,10 +19,10 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Verify bcr patches
         run: patch --dry-run -p1 --fuzz 0 < .bcr/patches/*.patch
-      - uses: lycheeverse/lychee-action@a8c4c7cb88f0c7386610c35eb25108e448569cb0 # v2.7.0
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           # Allow 503 Service Unavailable when rate limited
           args: --accept '200..=204,503' --base ${{ github.workspace }} --verbose --no-progress './**/*.md' './**/*.html'
@@ -37,8 +37,8 @@ jobs:
     env:
       USE_BAZEL_VERSION: ${{ matrix.version }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
+      - uses: actions/checkout@v7
+      - uses: aspect-build/setup-aspect@ccc445383a7d4cea499744d823a7698ae077a407 # v2026.45.0
         with:
           aspect-api-token: ${{ secrets.ASPECT_CLOUD_API_TOKEN }}
       - name: Test Go workspace
@@ -55,13 +55,13 @@ jobs:
           - 9.x
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: bazel-contrib/setup-bazel@f34d6a05eae3c24acab7fa54587492daeaeffdab # 0.19.2
         with:
           bazelrc: |
             common --announce_rc
             common --color=yes
-      - uses: aspect-build/setup-aspect@ebca96eb49ef58c00d4226de8bd3a0813507dd87 # v2026.38.3
+      - uses: aspect-build/setup-aspect@ccc445383a7d4cea499744d823a7698ae077a407 # v2026.45.0
         with:
           aspect-api-token: ${{ secrets.ASPECT_CLOUD_API_TOKEN }}
       - name: Test
@@ -96,7 +96,7 @@ jobs:
     env:
       USE_BAZEL_VERSION: "8.x"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: bazel-contrib/setup-bazel@f34d6a05eae3c24acab7fa54587492daeaeffdab # 0.19.2
       - name: Test Python type-only dependencies
         run: examples/python/test/ty_compatibility.sh "${{ matrix.rules-python }}" --test_output=errors

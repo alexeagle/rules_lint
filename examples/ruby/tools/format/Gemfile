@@ -2,4 +2,4 @@
 
 source "https://rubygems.org"
 
-gem "syntax_tree", "= 6.2.0"
+gem "syntax_tree", "= 6.3.0"

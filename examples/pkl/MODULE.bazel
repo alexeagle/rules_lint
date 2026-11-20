@@ -1,7 +1,7 @@
 "Bazel dependencies for Pkl formatting example"
 
 bazel_dep(name = "rules_lint")
-bazel_dep(name = "rules_pkl", version = "0.15.0")
+bazel_dep(name = "rules_pkl", version = "0.18.0")
 
 local_path_override(
     module_name = "rules_lint",

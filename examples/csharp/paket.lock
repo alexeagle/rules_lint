@@ -2,6 +2,5 @@ STORAGE: NONE
 RESTRICTION: == net9.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    CSharpier (1.1.2)
-    fantomas (7.0.3)
-    Paket (9.0.2)
+    CSharpier (1.4)
+    Paket (12.0)

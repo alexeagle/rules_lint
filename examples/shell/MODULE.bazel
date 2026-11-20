@@ -1,7 +1,7 @@
 "Bazel dependencies for Shell formatting and linting example"
 
 bazel_dep(name = "rules_lint")
-bazel_dep(name = "rules_shell", version = "0.5.0")
+bazel_dep(name = "rules_shell", version = "0.8.0")
 
 local_path_override(
     module_name = "rules_lint",

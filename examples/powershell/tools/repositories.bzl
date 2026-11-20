@@ -5,8 +5,8 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 def _repos_impl(mctx):
     http_archive(
         name = "pwsh",
-        url = "https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz",
-        sha256 = "1da6d6d6035d651f20e70ddee7c4c15ac6ab8b9fb40ee92240d91263f28a884b",
+        url = "https://github.com/PowerShell/PowerShell/releases/download/v7.7.0/powershell-7.7.0-linux-x64.tar.gz",
+        sha256 = "c89d9c682d2c403dfe726f3df948e359675235a5bd6fab535776de69729ca0cb",
         build_file_content = """exports_files(["pwsh"])""",
         patch_cmds = ["chmod +x pwsh"],
     )

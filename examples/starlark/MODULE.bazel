@@ -1,8 +1,8 @@
 "Bazel dependencies for Starlark linting example"
 
 bazel_dep(name = "rules_lint")
-bazel_dep(name = "bazel_lib", version = "3.0.0")
-bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.4")
+bazel_dep(name = "bazel_lib", version = "3.8.0")
+bazel_dep(name = "buildifier_prebuilt", version = "10.1.0")
 
 local_path_override(
     module_name = "rules_lint",

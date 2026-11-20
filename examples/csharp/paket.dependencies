@@ -2,6 +2,6 @@ framework: net9.0
 source https://api.nuget.org/v3/index.json
 storage: none
 
-nuget Paket 9.0.2
-nuget CSharpier 1.1.2
+nuget Paket 12.0.0
+nuget CSharpier 1.4.0
 

@@ -11,7 +11,7 @@ jobs:
   mirror:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Update ruff
         run: |
           ./lint/mirror_ruff.sh

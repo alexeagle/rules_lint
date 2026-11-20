@@ -4,16 +4,16 @@
     "moment": "*"
   },
   "devDependencies": {
-    "@eslint/js": "^9.16.0",
-    "@types/node": "^18",
-    "eslint": "^9.16.0",
-    "prettier": "^2.8.7",
-    "stylelint": "^16",
-    "stylelint-config-standard": "^36.0.1",
-    "typescript": "4.9.5",
+    "@eslint/js": "^10.0.0",
+    "@types/node": "^26.0.0",
+    "eslint": "^10.0.0",
+    "prettier": "^3.0.0",
+    "stylelint": "^18.0.0",
+    "stylelint-config-standard": "^41.0.0",
+    "typescript": "7.0.2",
     "typescript-eslint": "^8.17.0"
   },
-  "packageManager": "pnpm@10.5.2",
+  "packageManager": "pnpm@12.21.0",
   "pnpm": {
     "onlyBuiltDependencies": []
   }

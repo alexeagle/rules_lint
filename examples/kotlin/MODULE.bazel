@@ -1,9 +1,9 @@
 "Bazel dependencies for Kotlin formatting and linting example"
 
 bazel_dep(name = "rules_lint")
-bazel_dep(name = "rules_kotlin", version = "1.9.6")
-bazel_dep(name = "rules_java", version = "8.5.0")
-bazel_dep(name = "bazel_skylib", version = "1.4.2")
+bazel_dep(name = "rules_kotlin", version = "2.4.21")
+bazel_dep(name = "rules_java", version = "9.9.0")
+bazel_dep(name = "bazel_skylib", version = "1.9.2")
 
 local_path_override(
     module_name = "rules_lint",

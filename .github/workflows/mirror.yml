@@ -12,6 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - name: Check mirror bot access
+        env:
+          GH_TOKEN: ${{ secrets.BCR_PUBLISH_TOKEN }}
+        run: |
+          if [[ "$(gh api "repos/$GITHUB_REPOSITORY" --jq '.permissions.push')" != "true" ]]; then
+            echo "::error::BCR_PUBLISH_TOKEN needs write access to $GITHUB_REPOSITORY. See .github/workflows/README.md."
+            exit 1
+          fi
       - name: Update ruff
         run: |
           ./lint/mirror_ruff.sh

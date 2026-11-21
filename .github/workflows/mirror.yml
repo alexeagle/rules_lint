@@ -10,6 +10,8 @@ on:
 jobs:
   mirror:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v7
       - name: Check mirror bot access
@@ -21,16 +23,15 @@ jobs:
             exit 1
           fi
       - name: Update ruff
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           ./lint/mirror_ruff.sh
           npx @bazel/buildifier lint/ruff_versions.bzl
-      - name: Download and Extract Latest Multitool
-        run: wget -O- https://github.com/theoremlp/multitool/releases/download/v0.9.0/multitool-x86_64-unknown-linux-gnu.tar.xz | tar --strip-components=1 -xJf -
       - name: Find Updates and Render Lockfile
-        run: |
-          ./multitool --lockfile lint/multitool.lock.json update
-          ./multitool --lockfile format/multitool.lock.json update
-          rm multitool
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/workflows/update_multitool.py lint/multitool.lock.json format/multitool.lock.json
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8
         with:

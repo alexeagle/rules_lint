@@ -87,41 +87,41 @@
     "binaries": [
       {
         "kind": "archive",
-        "url": "https://github.com/google/go-jsonnet/releases/download/v0.21.0/go-jsonnet_Linux_arm64.tar.gz",
+        "url": "https://github.com/google/go-jsonnet/releases/download/v0.22.0/go-jsonnet_0.22.0_linux_arm64.tar.gz",
         "file": "jsonnetfmt",
-        "sha256": "4a263da605dbe2edb99529f495266211062fac476789f2119408bc223338f1d6",
+        "sha256": "3016b049254cb92548ba99304b6f44ec3795e6173f908e3ce3c5add57243fe20",
         "os": "linux",
         "cpu": "arm64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/google/go-jsonnet/releases/download/v0.21.0/go-jsonnet_Linux_x86_64.tar.gz",
+        "url": "https://github.com/google/go-jsonnet/releases/download/v0.22.0/go-jsonnet_0.22.0_linux_amd64.tar.gz",
         "file": "jsonnetfmt",
-        "sha256": "ad3181fde77726b02d17eb4e72687020bf2cb35b9336cdeaaca4783c7ff104f7",
+        "sha256": "e87a93ea44e34da92c15636205c7f2240bf3ac92d00ccb855dbb4e7e03ea6941",
         "os": "linux",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/google/go-jsonnet/releases/download/v0.21.0/go-jsonnet_Darwin_arm64.tar.gz",
+        "url": "https://github.com/google/go-jsonnet/releases/download/v0.22.0/go-jsonnet_0.22.0_darwin_arm64.tar.gz",
         "file": "jsonnetfmt",
-        "sha256": "398189a264e31a2c1316eed8ee6308306a221fd10b72f405def0100d295efeac",
+        "sha256": "112534191b6e27f2ae01bb80c6ab82950fb7bf5772e2e81c5472f59a069700f5",
         "os": "macos",
         "cpu": "arm64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/google/go-jsonnet/releases/download/v0.21.0/go-jsonnet_Darwin_x86_64.tar.gz",
+        "url": "https://github.com/google/go-jsonnet/releases/download/v0.22.0/go-jsonnet_0.22.0_darwin_amd64.tar.gz",
         "file": "jsonnetfmt",
-        "sha256": "a6cee4b381d2319fa807d7a7bf8a4ecf2d0cca64e2bcd53eeaa575ce1f7689a4",
+        "sha256": "2ada40ece13e8b4e1f37c06315783110c84b496963b0b8b90809daf69df7dfc9",
         "os": "macos",
         "cpu": "x86_64"
       },
       {
         "kind": "archive",
-        "url": "https://github.com/google/go-jsonnet/releases/download/v0.21.0/go-jsonnet_Windows_x86_64.tar.gz",
+        "url": "https://github.com/google/go-jsonnet/releases/download/v0.22.0/go-jsonnet_0.22.0_windows_amd64.tar.gz",
         "file": "jsonnetfmt.exe",
-        "sha256": "81d71a287ee5dfd0860831eeac281a7327ce8876d5fe9a8b7e19726dbbc0ce4f",
+        "sha256": "277b83ddbe836a627dcde0655720aa42b02277fdf3a9cdaebeef2a53e98599b1",
         "os": "windows",
         "cpu": "x86_64"
       }

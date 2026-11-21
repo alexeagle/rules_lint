@@ -31,10 +31,7 @@ map(
 )[]
 '
 
-curl > $RELEASES \
-  --silent \
-  --header "Accept: application/vnd.github.v3+json" \
-  https://api.github.com/repos/${REPOSITORY}/releases?per_page=1
+gh api "repos/${REPOSITORY}/releases?per_page=1" > "$RELEASES"
 
 jq "$JQ_FILTER" <$RELEASES >$RAW
 

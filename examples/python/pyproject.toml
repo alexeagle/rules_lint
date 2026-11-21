@@ -27,7 +27,7 @@ exclude = ['test/excluded.py']
 
 # See https://docs.astral.sh/ty/reference/configuration/
 [tool.ty.rules]
-call-non-callable = "ignore"
+not-callable = "ignore"
 
 [tool.pydoclint]
 style = "google"

@@ -3,6 +3,7 @@ load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//lint/private:patcher_run.bzl", "patcher_run")
 load(":clang_tidy_flags_test.bzl", "clang_tidy_flags_test_suite")
+load(":cppcheck_args_test.bzl", "cppcheck_args_test_suite")
 load(":gcc_includes_test.bzl", "gcc_includes_test")
 load(":lint_test_no_report_test.bzl", "no_report_test", "skipped_lint_test")
 load(":lint_test_xml.bzl", "fake_lint_test")
@@ -156,4 +157,7 @@ diff_test(
 )
 
 gcc_includes_test(name = "gcc_includes_test")
+
 clang_tidy_flags_test_suite(name = "clang_tidy_flags_test")
+
+cppcheck_args_test_suite(name = "cppcheck_args_test")

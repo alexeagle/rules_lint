@@ -34,21 +34,8 @@ def _filter_srcs(rule):
     else:
         return [s for s in rule.files.srcs if _is_source(s)]
 
-def _prefixed(list, prefix):
-    array = []
-    for arg in list:
-        array.append("{}{}".format(prefix, arg))
-    return array
-
-def _get_compiler_args(compilation_context):
-    # add includes
-    args = []
-    args.extend(_prefixed(compilation_context.framework_includes.to_list(), "-I"))
-    args.extend(_prefixed(compilation_context.includes.to_list(), "-I"))
-    args.extend(_prefixed(compilation_context.quote_includes.to_list(), "-I"))
-    args.extend(_prefixed(compilation_context.system_includes.to_list(), "-I"))
-    args.extend(_prefixed(compilation_context.external_includes.to_list(), "-I"))
-    return args
+def _short_path(file):
+    return file.short_path
 
 def cppcheck_action(ctx, compilation_context, executable, srcs, stdout, exit_code, do_xml = False, args = []):
     """Create a Bazel Action that spawns a cppcheck process.
@@ -77,34 +64,39 @@ def cppcheck_action(ctx, compilation_context, executable, srcs, stdout, exit_cod
 
     env["CPPCHECK__VERBOSE"] = "1" if ctx.attr._verbose else ""
 
-    cppcheck_args = list(args)
+    cppcheck_args = ctx.actions.args()
+    cppcheck_args.add_all(args)
 
     # cppcheck shall fail with exit code != 0 if issues found
-    cppcheck_args.append("--error-exitcode=31")
+    cppcheck_args.add("--error-exitcode=31")
 
-    # add include paths
-    cppcheck_args.extend(_get_compiler_args(compilation_context))
+    # Keep transitive include paths shared during analysis. Expanding and
+    # prefixing them here retains a copy per target and report action.
+    cppcheck_args.add_all(compilation_context.framework_includes, format_each = "-I%s")
+    cppcheck_args.add_all(compilation_context.includes, format_each = "-I%s")
+    cppcheck_args.add_all(compilation_context.quote_includes, format_each = "-I%s")
+    cppcheck_args.add_all(compilation_context.system_includes, format_each = "-I%s")
+    cppcheck_args.add_all(compilation_context.external_includes, format_each = "-I%s")
 
     if do_xml:
         env["CPPCHECK__OUTPUT_FILE"] = stdout.path
-        cppcheck_args.append("--xml-version=3")
+        cppcheck_args.add("--xml-version=3")
     else:
         # The SARIF parser is keyed to this exact layout, so it is not user-overridable.
         # {severity} appears twice on purpose: errorformat consumes the leading copy to derive
         # the SARIF level, the copy in the tag survives into the message text. With
         # --report-type, cppcheck substitutes the coding-standard classification for {severity}
         # and the guideline for {id}.
-        cppcheck_args.append("--template={file}:{line}:{column}: {severity}: {message} [{severity} {id}]")
+        cppcheck_args.add("--template={file}:{line}:{column}: {severity}: {message} [{severity} {id}]")
 
-    for f in srcs:
-        cppcheck_args.append(f.short_path)
+    cppcheck_args.add_all(srcs, map_each = _short_path, expand_directories = False)
 
     ctx.actions.run_shell(
         inputs = _gather_inputs(compilation_context, srcs),
         outputs = outputs,
         tools = [executable._cppcheck_wrapper, executable._cppcheck, find_cpp_toolchain(ctx).all_files],
         command = executable._cppcheck_wrapper.path + ' "$@"',
-        arguments = [executable._cppcheck.path] + cppcheck_args,
+        arguments = [executable._cppcheck.path, cppcheck_args],
         env = env,
         mnemonic = _MNEMONIC,
         progress_message = "Linting %{label} with cppcheck",

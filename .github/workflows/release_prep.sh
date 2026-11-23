@@ -206,36 +206,42 @@ tar --file $ARCHIVE_TMP --append ${PREFIX}/tools/integrity.bzl
 ############
 
 gzip <$ARCHIVE_TMP >$ARCHIVE
-# Note: this happens to match what we publish to BCR in source.json, though it's not required to
-INTEGRITY="sha256-$(shasum -a 256 $ARCHIVE | xxd -p -r | base64)"
-
-cat << EOF
-Add this to your `MODULE.bazel` file:
+cat <<EOF
+Add this to your \`MODULE.bazel\` file:
 
 \`\`\`starlark
 bazel_dep(name = "rules_lint", version = "${TAG:1}")
 \`\`\`
 
-This repo also provides a \`lint\` task for the [Aspect CLI].
-Add this to your \`MODULE.aspect\` file:
+Upgrading from \`aspect_rules_lint\`? Replace it with \`rules_lint\` in your
+\`bazel_dep\`, \`load()\` statements, repository labels, and flags such as
+\`--@aspect_rules_lint//lint:fix\`. See the [module migration guide](https://github.com/bazel-contrib/rules_lint/pull/1047).
 
-\`\`\`starlark
-# AXL dependencies; see https://github.com/aspect-extensions
-axl_archive_dep(
-    name = "rules_lint",
-    urls = ["https://github.com/bazel-contrib/rules_lint/releases/download/${TAG}/rules_lint-${TAG}.tar.gz"],
-    integrity = "${INTEGRITY}",
-    strip_prefix = "rules_lint-${TAG:1}",
-    dev = True,
-    auto_use_tasks = True,
-)
+For the built-in \`lint\` task in the [Aspect CLI], [install the CLI] and use
+version 2026.45.6 or later. Pin the version in \`.aspect/version.axl\`:
+
+\`\`\`python
+version("2026.45.6")
 \`\`\`
+
+Add the following setting to your existing \`config\` function in
+\`.aspect/config.axl\` (or create it if you have none):
+
+\`\`\`python
+def config(ctx: ConfigContext):
+    ctx.tasks["lint"].args.rules_lint_fix_flag = "@rules_lint//lint:fix"
+\`\`\`
+
+This points \`aspect lint --fix\` and fix-suggestion integrations such as
+\`GithubLintComments\` at the renamed flag. Configure your lint aspects by
+following the [Aspect CLI setup example](https://github.com/bazel-contrib/rules_lint/blob/${TAG}/README.md#linting).
 
 Then, follow the install instructions for
 - linting: https://github.com/bazel-contrib/rules_lint/blob/${TAG}/docs/linting.md
 - formatting: https://github.com/bazel-contrib/rules_lint/blob/${TAG}/docs/formatting.md
 
 [Aspect CLI]: https://docs.aspect.build/cli
+[install the CLI]: https://docs.aspect.build/cli/install
 EOF
 
 # Changes since the previous v* tag. No pathspec: the root module is built

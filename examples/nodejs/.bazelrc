@@ -16,6 +16,10 @@ build:lint --aspects=//tools/lint:linters.bzl%vale
 common:ci --remote_download_outputs=minimal
 common:ci --nobuild_runfile_links
 
+# Each JS-plugin Oxlint action reserves a large arena. Do not run several
+# reservations concurrently, even on the medium CI host.
+build:ci --jobs=1
+
 # Override the preset's `--lockfile_mode=error` on CI since we don't
 # yet commit MODULE.bazel.lock — see .gitignore.
 common:ci --lockfile_mode=off

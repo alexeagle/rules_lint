@@ -35,4 +35,5 @@ pip_compile(
     name = "requirements",
     requirements_in = "pyproject.toml",
     requirements_txt = "requirements.txt",
+    universal = True,
 )

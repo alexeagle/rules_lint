@@ -55,7 +55,7 @@ def pipeline(root):
         })
     for folder, checks in sorted(discover(root).items()):
         group = examples if folder.startswith("examples/") else ruleset
-        group["steps"].append({
+        job = {
             "label": f":test_tube: {folder.removeprefix('examples/')}",
             "key": folder.replace("/", "-"),
             "command": shlex.join([
@@ -63,7 +63,13 @@ def pipeline(root):
             ]),
             "timeout_in_minutes": 60,
             "depends_on": "setup",
-        })
+        }
+        # Oxlint's JS-plugin bridge reserves a large arena even for tiny files.
+        # Keep plugin coverage on a medium host until the upstream allocator fix:
+        # https://github.com/oxc-project/oxc/issues/20331
+        if folder == "examples/nodejs":
+            job["agents"] = {"queue": "linux-medium"}
+        group["steps"].append(job)
     return {"steps": [examples, ruleset]}
 
 

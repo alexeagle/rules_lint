@@ -19,6 +19,10 @@ eslint = lint_eslint_aspect(
 eslint_test = lint_test(aspect = eslint)
 
 oxlint = lint_oxlint_aspect(
+    # JS plugins reserve a large arena per worker; small Linux CI hosts can fail
+    # that allocation. Limit this example until the upstream allocator is fixed:
+    # https://github.com/oxc-project/oxc/issues/20331
+    args = ["--threads=1"],
     binary = Label("//tools/lint:oxlint"),
     config = Label("//:oxlint_config"),
     fix_binary = Label("//tools/lint:oxlint_for_fix"),

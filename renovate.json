@@ -23,6 +23,12 @@
         "lint/scala/MODULE.bazel"
       ],
       "enabled": false
+    },
+    {
+      "description": "Keep the Node.js example within typescript-eslint 8 support.",
+      "matchFileNames": ["examples/nodejs/package.json"],
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
     }
   ]
 }

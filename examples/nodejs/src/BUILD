@@ -1,7 +1,7 @@
-load("@rules_lint//format:defs.bzl", "format_test")
 load("@aspect_rules_swc//swc:defs.bzl", "swc")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
 load("@bazel_skylib//lib:partial.bzl", "partial")
+load("@rules_lint//format:defs.bzl", "format_test")
 load("//tools/lint:linters.bzl", "eslint_test", "oxlint_test")
 
 package(default_visibility = ["//visibility:public"])
@@ -72,6 +72,7 @@ ts_project(
         swc,
         swcrc = "//:.swcrc",
     ),
+    tsconfig = ":tsconfig",
     deps = [
         ":ts_dep",
         "//:node_modules/dayjs",
@@ -81,7 +82,7 @@ ts_project(
 # Regression test for https://github.com/aspect-build/rules_lint/issues/368
 eslint_test(
     name = "eslint_empty_report",
-    srcs = [":ts"],
+    srcs = [":ts_dep"],
 )
 
 format_test(

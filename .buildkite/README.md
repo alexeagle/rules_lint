@@ -2,7 +2,13 @@
 
 Set the pipeline's steps to the contents of [pipeline.yml](pipeline.yml).
 The setup job needs Python 3.9+ and `buildkite-agent`; generated jobs need
-Git and Docker on a Linux agent. Jobs use the pipeline's default queue.
+Git and Docker on a Linux agent. Jobs use the pipeline's default queue except
+Node.js, which requires a `linux-medium` hosted queue (4 vCPU, 16 GB RAM).
+Oxlint's JS-plugin bridge reserves a large arena per worker even for tiny files;
+the larger host preserves the plugin and multi-pass autofix demonstration while
+[the upstream allocator bug](https://github.com/oxc-project/oxc/issues/20331)
+remains open. The example caps Oxlint at one worker per invocation and serializes
+Bazel CI actions so multiple arena reservations do not compete for host memory.
 The checkout must be accessible to the Docker daemon for the bind mount.
 
 The pipeline discovers `examples/**/tools/format`, `examples/**/tools/lint`,

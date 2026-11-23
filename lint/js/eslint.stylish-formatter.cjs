@@ -45,7 +45,7 @@ function table(rows_, opts) {
           return c + s;
         })
         .join(hsep)
-        .trimEnd()
+        .trimEnd(),
     )
     .join("\n");
 }
@@ -62,14 +62,39 @@ const eslintEntry = process.argv[1];
 const idx = eslintEntry.lastIndexOf("node_modules");
 if (idx < 0) {
   throw new Error(
-    "node_modules not found in eslint entry point " + eslintEntry
+    "node_modules not found in eslint entry point " + eslintEntry,
   );
 }
 
 // Modify the upstream code to pass through an explicit `require.resolve` that starts from eslint
-const chalk = require(require.resolve("chalk", {
-  paths: [eslintEntry.substring(0, idx)],
-}));
+let chalk;
+try {
+  chalk = require(
+    require.resolve("chalk", {
+      paths: [eslintEntry.substring(0, idx)],
+    }),
+  );
+} catch (error) {
+  if (error.code !== "MODULE_NOT_FOUND") {
+    throw error;
+  }
+  // ESLint 10 no longer depends on chalk. Use Node's built-in styles instead
+  // of requiring consumers to add an undeclared formatter dependency.
+  const color =
+    process.env.FORCE_COLOR !== "0" &&
+    Boolean(process.env.FORCE_COLOR || process.stdout.isTTY);
+  const style = (formats, text) =>
+    color && typeof util.styleText === "function"
+      ? util.styleText(formats, String(text), { validateStream: false })
+      : String(text);
+  chalk = Object.fromEntries(
+    ["underline", "red", "yellow", "dim", "reset"].map((format) => {
+      const paint = (text) => style(format, text);
+      paint.bold = (text) => style([format, "bold"], text);
+      return [format, paint];
+    }),
+  );
+}
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -111,7 +136,7 @@ module.exports = function (results, context) {
 
     // LOCAL MODIFICATION: print path relative to the working directory
     output += `${chalk.underline(
-      require("node:path").relative(context.cwd, result.filePath)
+      require("node:path").relative(context.cwd, result.filePath),
     )}\n`;
 
     output += `${table(
@@ -139,11 +164,11 @@ module.exports = function (results, context) {
         stringLength(str) {
           return util.stripVTControlCharacters(str).length;
         },
-      }
+      },
     )
       .split("\n")
       .map((el) =>
-        el.replace(/(\d+)\s+(\d+)/u, (m, p1, p2) => chalk.dim(`${p1}:${p2}`))
+        el.replace(/(\d+)\s+(\d+)/u, (m, p1, p2) => chalk.dim(`${p1}:${p2}`)),
       )
       .join("\n")}\n\n`;
   });
@@ -163,7 +188,7 @@ module.exports = function (results, context) {
         warningCount,
         pluralize(" warning", warningCount),
         ")\n",
-      ].join("")
+      ].join(""),
     );
 
     if (fixableErrorCount > 0 || fixableWarningCount > 0) {
@@ -176,7 +201,7 @@ module.exports = function (results, context) {
           fixableWarningCount,
           pluralize(" warning", fixableWarningCount),
           " potentially fixable with the `--fix` option.\n",
-        ].join("")
+        ].join(""),
       );
     }
   }

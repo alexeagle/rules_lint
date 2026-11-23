@@ -2,6 +2,7 @@
 name = "scaffold_test_4309"
 classifiers = ["Private :: Do Not Upload"]
 version = "0"
+requires-python = ">=3.12"
 
 # Dependencies should NOT use "Version Matching clauses" (matching operator `==`)
 # https://packaging.python.org/en/latest/specifications/version-specifiers/#version-matching

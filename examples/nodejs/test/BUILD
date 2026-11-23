@@ -5,7 +5,7 @@ load("//tools/lint:linters.bzl", "eslint_test", "oxlint_test", "stylelint_test")
 
 eslint_test(
     name = "eslint_empty_report",
-    srcs = ["//src:ts"],
+    srcs = ["//src:ts_dep"],
 )
 
 stylelint_test(

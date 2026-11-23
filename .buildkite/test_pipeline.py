@@ -84,6 +84,14 @@ class PipelineTest(unittest.TestCase):
             "format": ["integration"],
         })
 
+    def test_only_nodejs_requires_the_medium_queue(self):
+        for folder in ("nodejs", "yaml"):
+            self.write(self.root / "examples" / folder / "tools/lint/BUILD")
+        jobs = [job for group in pipeline.pipeline(self.root)["steps"] for job in group["steps"]]
+        nodejs = next(job for job in jobs if job["key"] == "examples-nodejs")
+        self.assertEqual(nodejs["agents"], {"queue": "linux-medium"})
+        self.assertTrue(all("agents" not in job for job in jobs if job is not nodejs))
+
     def test_runner_restores_fixtures_and_continues_after_failure(self):
         folder = self.root / "examples/nodejs"
         self.write(folder / "fixture", "original")

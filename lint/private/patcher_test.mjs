@@ -10,7 +10,7 @@ import test from "node:test";
 // Use its underlying Node binary for the fake linter, which has an empty env.
 const node = process.env.JS_BINARY__NODE_BINARY || process.execPath;
 
-function runPatcher(t, transform, maxFixPasses, chdir = "") {
+function runPatcher(t, transform, maxFixPasses, chdir = "", options = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "patcher-test-"));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const execroot = path.join(root, "execroot");
@@ -44,17 +44,21 @@ function runPatcher(t, transform, maxFixPasses, chdir = "") {
     [fileURLToPath(new URL("./patcher.mjs", import.meta.url)), config],
     {
       cwd: execroot,
-      env: { ...process.env, JS_BINARY__WORKSPACE: "workspace" },
+      env: {
+        ...process.env,
+        JS_BINARY__WORKSPACE: "workspace",
+        ...options.env,
+      },
       encoding: "utf8",
     }
   );
-  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.status, options.status ?? 0, result.stderr);
   assert.equal(
     fs.readFileSync(path.join(sourceRoot, "source.ts"), "utf8"),
     "0\n"
   );
   return {
-    patch: fs.readFileSync(output, "utf8"),
+    patch: fs.existsSync(output) ? fs.readFileSync(output, "utf8") : undefined,
     passes: result.stdout.trim().split("\n").length,
     stderr: result.stderr,
   };
@@ -97,4 +101,31 @@ test("runs native tools from the requested bin directory", (t) => {
   );
   assert.match(result.patch, /\+2\n/);
   assert.equal(result.passes, 3);
+});
+
+test("rejects a linter terminated by a signal", (t) => {
+  const result = runPatcher(t, "process.kill(process.pid, 'SIGTERM')", 1, "", {
+    status: 1,
+  });
+  assert.match(result.stderr, /Linter terminated by SIGTERM/);
+});
+
+test("preserves ordinary linter exit codes", (t) => {
+  for (const status of [1, 7]) {
+    const result = runPatcher(t, `process.exit(${status})`, 1, "", { status });
+    assert.equal(result.patch, "");
+  }
+});
+
+test("rejects diff failure", (t) => {
+  // Node rejects diff's command-line flags with a nonzero exit code.
+  const result = runPatcher(t, "value + 1", 1, "", {
+    status: 1,
+    env: {
+      JS_BINARY__RUNFILES: path.dirname(node),
+      DIFF_BIN: path.basename(node),
+    },
+  });
+  assert.match(result.stderr, /diff exited with status [2-9]/);
+  assert.equal(result.patch, undefined);
 });

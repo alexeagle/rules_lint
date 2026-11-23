@@ -137,27 +137,42 @@ async function main(args, sandbox) {
     ? path.join(process.env["JS_BINARY__RUNFILES"], process.env["DIFF_BIN"])
     : "diff";
 
-  for (const f of config.files_to_diff) {
-    const origF = path.join(process.cwd(), sourcePrefix, f);
-    const newF = path.join(sandbox, sourcePrefix, f);
-    debug(`diffing ${origF} to ${newF}`);
-    // NB: use a/ and b/ prefixes, intended so the result is applied with 'patch -p1'
-    const results = childProcess.spawnSync(
-      // Note: not using @bazel/runfiles library for lookup because it's a pain to ship dependencies
-      diffBin,
-      [`--label=a/${f}`, `--label=b/${f}`, "--unified", origF, newF],
-      {
-        encoding: "utf8",
+  try {
+    for (const f of config.files_to_diff) {
+      const origF = path.join(process.cwd(), sourcePrefix, f);
+      const newF = path.join(sandbox, sourcePrefix, f);
+      debug(`diffing ${origF} to ${newF}`);
+      // NB: use a/ and b/ prefixes, intended so the result is applied with 'patch -p1'
+      const results = childProcess.spawnSync(
+        // Note: not using @bazel/runfiles library for lookup because it's a pain to ship dependencies
+        diffBin,
+        [`--label=a/${f}`, `--label=b/${f}`, "--unified", origF, newF],
+        {
+          encoding: "utf8",
+        }
+      );
+      if (results.error) {
+        throw results.error;
       }
-    );
-    debug(results.stdout);
-    fs.writeSync(diffOut, results.stdout);
-    if (results.error) {
-      console.error(results.error);
+      if (results.signal) {
+        throw new Error(`diff terminated by ${results.signal}`);
+      }
+      if (results.status > 1) {
+        throw new Error(
+          `diff exited with status ${results.status}: ${results.stderr}`
+        );
+      }
+      debug(results.stdout);
+      fs.writeSync(diffOut, results.stdout);
     }
+  } catch (error) {
+    // Capturing the exit code can make the launcher succeed. A missing patch
+    // still fails the Bazel action, so never leave a partial output behind.
+    fs.rmSync(config.output);
+    throw error;
+  } finally {
+    fs.closeSync(diffOut);
   }
-
-  fs.closeSync(diffOut);
 
   return ret.status;
 }
@@ -173,7 +188,7 @@ async function main(args, sandbox) {
     process.exitCode = await main(process.argv.slice(2), sandbox);
   } catch (e) {
     console.error(e);
-    process.exit(1);
+    process.exitCode = 1;
   } finally {
     try {
       if (sandbox) {

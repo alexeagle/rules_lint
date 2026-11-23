@@ -22,11 +22,10 @@ memory_flags=(
   --host_jvm_args=-DRULE_MEMORY_TRACKER=1
 )
 
-# From the repository root; this refuses to overwrite an existing fixture.
-python3 tools/memory_profile_fixture.py cpp
+# From the repository root.
 cd examples/cpp
 bazel "${memory_flags[@]}" build --nobuild --config=lint --lockfile_mode=off \
-  //src/... //_memory_profile/...
+  //src/...
 bazel "${memory_flags[@]}" dump --rules
 bazel "${memory_flags[@]}" dump --skylark_memory=/tmp/cpp-memory.gz
 pprof -top -cum /tmp/cpp-memory.gz
@@ -39,17 +38,18 @@ or compilers. Keep the workload and flags identical for before/after runs. Avoid
 include loading and dependency allocations as well as analysis. They estimate
 live sampled memory, not total allocations, peak RSS, or execution memory.
 
-For Python, use `examples/python` and `--config=lint //src/...`. For Java, generate
-the `java` fixture and use `examples/java` with
-`--aspects=//tools/lint:linters.bzl%spotbugs //src/... //_memory_profile/...`.
-The Java fixture has 100 libraries and 100 consumers sharing those dependencies.
-The C++ fixture has 100 libraries each exporting 20 include directories, and
-100 consumers sharing those dependencies. Remove the generated
-`examples/{cpp,java}/_memory_profile` directories when done.
+For Python, use `examples/python` and `--config=lint //src/...`. For Java, use
+`examples/java` with `--aspects=//tools/lint:linters.bzl%spotbugs //src/...`.
 
 ## Measured change
 
 Local macOS arm64, Bazel 9.3.3, allocation agent 3.3.5, November 2026:
+
+The measurements below added temporary `//_memory_profile/...` targets to the
+example commands. The C++ workload had 100 libraries each exporting 20 include
+directories, and 100 consumers sharing all those dependencies. The Java workload
+had 100 libraries and 100 consumers sharing those dependencies. These workloads
+were generated on demand and removed after profiling.
 
 | C++ workload, both linter aspects | Before | After |
 | --- | ---: | ---: |

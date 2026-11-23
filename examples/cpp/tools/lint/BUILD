@@ -17,7 +17,11 @@ native_binary(
             "@bazel_tools//src/conditions:windows_x64": "clang-tidy.exe",
         },
     ),
-    out = "clang_tidy",
+    # Combined LLVM drivers may dispatch by executable name; preserve clang-tidy.
+    out = select({
+        "@platforms//os:windows": "clang-tidy.exe",
+        "//conditions:default": "clang-tidy",
+    }),
 )
 
 # cppcheck

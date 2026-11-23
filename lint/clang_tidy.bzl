@@ -11,8 +11,8 @@ e.g. using llvm_toolchain:
 ```starlark
 native_binary(
     name = "clang_tidy",
-    src = "@llvm_toolchain_llvm//:bin/clang-tidy"
-    out = "clang_tidy",
+    src = "@llvm_toolchain_llvm//:bin/clang-tidy",
+    out = "clang-tidy",
 )
 ```
 
@@ -20,10 +20,14 @@ e.g as native binary:
 ```starlark
 native_binary(
     name = "clang_tidy",
-    src = "clang-tidy.exe"
-    out = "clang_tidy",
+    src = "clang-tidy.exe",
+    out = "clang-tidy.exe",
 )
 ```
+
+Keep the executable filename `clang-tidy` (`clang-tidy.exe` on Windows).
+Combined LLVM drivers may use that name to select the tool to run; the Bazel
+target can still be named `clang_tidy`.
 
 Finally, create the linter aspect, typically in `tools/lint/linters.bzl`:
 
@@ -31,7 +35,7 @@ Finally, create the linter aspect, typically in `tools/lint/linters.bzl`:
 load("@rules_lint//lint:clang_tidy.bzl", "lint_clang_tidy_aspect")
 
 clang_tidy = lint_clang_tidy_aspect(
-    binary = Label("//path/to:clang-tidy"),
+    binary = Label("//path/to:clang_tidy"),
     configs = [Label("//path/to:.clang-tidy")],
 )
 ```
@@ -440,8 +444,8 @@ def lint_clang_tidy_aspect(
             ```starlark
             native_binary(
                 name = "clang_tidy",
-                src = "clang-tidy.exe"
-                out = "clang_tidy",
+                src = "clang-tidy.exe",
+                out = "clang-tidy.exe",
             )
             ```
         configs: labels of the .clang-tidy files to make available to clang-tidy's config search. These may be

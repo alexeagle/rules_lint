@@ -16,7 +16,7 @@ ty = lint_ty_aspect(
 """
 
 load("@rules_python//python:defs.bzl", "PyInfo")
-load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "filter_srcs", "noop_lint_action", "output_files", "parse_to_sarif_action", "should_visit")
+load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "PYTHON_SOURCE_ATTRIBUTES", "filter_srcs", "noop_lint_action", "output_files", "parse_to_sarif_action", "should_visit")
 
 _MNEMONIC = "AspectRulesLintTy"
 
@@ -175,7 +175,8 @@ def _ty_aspect_impl(target, ctx):
         return []
 
     # Collect transitive sources from dependencies using the standard PyInfo provider.
-    transitive_sources = []
+    # The target's own stubs are inputs too, even when generated and so not linted.
+    transitive_sources = [depset(getattr(ctx.rule.files, "pyi_srcs", []))]
 
     # Collect import paths from PyInfo for --extra-search-path.
     # _resolve_import_path maps each entry to the correct execroot-relative path:
@@ -210,7 +211,13 @@ def _ty_aspect_impl(target, ctx):
                         import_paths[dep.label.workspace_root] = True
                         import_paths[ctx.bin_dir.path + "/" + dep.label.workspace_root] = True
 
-    files_to_lint = filter_srcs(ctx.rule)
+    # The target's own `imports` roots, so its sources resolve its own stubs too.
+    if PyInfo in target:
+        for import_path in target[PyInfo].imports.to_list():
+            for e in _resolve_import_path(import_path, ctx.workspace_name, ctx.bin_dir.path):
+                import_paths[e] = True
+
+    files_to_lint = filter_srcs(ctx.rule, PYTHON_SOURCE_ATTRIBUTES)
     outputs, info = output_files(_MNEMONIC, target, ctx)
 
     if len(files_to_lint) == 0:

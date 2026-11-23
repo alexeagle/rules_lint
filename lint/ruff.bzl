@@ -46,7 +46,7 @@ ruff = lint_ruff_aspect(
 """
 
 load("@rules_python//python:defs.bzl", "PyInfo")
-load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "filter_srcs", "noop_lint_action", "output_files", "parse_to_sarif_action", "patch_and_output_files", "should_visit")
+load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "PYTHON_SOURCE_ATTRIBUTES", "filter_srcs", "noop_lint_action", "output_files", "parse_to_sarif_action", "patch_and_output_files", "should_visit")
 load("//lint/private:patcher_action.bzl", "patcher_attrs", "run_patcher")
 
 _MNEMONIC = "AspectRulesLintRuff"
@@ -174,7 +174,7 @@ def _ruff_aspect_impl(target, ctx):
     if not should_visit(ctx.rule, ctx.attr._rule_kinds, ctx.attr._filegroup_tags):
         return []
 
-    files_to_lint = filter_srcs(ctx.rule)
+    files_to_lint = filter_srcs(ctx.rule, PYTHON_SOURCE_ATTRIBUTES)
     if ctx.attr._options[LintOptionsInfo].fix:
         outputs, info = patch_and_output_files(ctx.attr._mnemonic, target, ctx)
     else:

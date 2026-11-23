@@ -32,7 +32,7 @@ pydoclint = lint_pydoclint_aspect(
 ```
 """
 
-load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "filter_srcs", "noop_lint_action", "output_files", "parse_to_sarif_action", "should_visit")
+load("//lint/private:lint_aspect.bzl", "LintOptionsInfo", "OPTIONAL_SARIF_PARSER_TOOLCHAIN", "OUTFILE_FORMAT", "PYTHON_SOURCE_ATTRIBUTES", "filter_srcs", "noop_lint_action", "output_files", "parse_to_sarif_action", "should_visit")
 
 _MNEMONIC = "AspectRulesLintPydoclint"
 
@@ -88,7 +88,7 @@ def _pydoclint_aspect_impl(target, ctx):
         return []
 
     outputs, info = output_files(_MNEMONIC, target, ctx)
-    files_to_lint = filter_srcs(ctx.rule)
+    files_to_lint = filter_srcs(ctx.rule, PYTHON_SOURCE_ATTRIBUTES)
 
     if len(files_to_lint) == 0:
         noop_lint_action(ctx, outputs)

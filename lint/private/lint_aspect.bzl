@@ -174,11 +174,28 @@ def patch_and_output_files(mnemonic, target, ctx, sibling = None, files_to_lint 
             rules_lint_patch = depset(patch),
         )
 
-def filter_srcs(rule):
+# Python rules may declare `.pyi` type stubs in `pyi_srcs`, as rules_python's `py_library` does.
+PYTHON_SOURCE_ATTRIBUTES = ["srcs", "pyi_srcs"]
+
+def filter_srcs(rule, source_attributes = ["srcs"]):
+    """Returns the files a linter should check for a rule.
+
+    Generated and external files are dropped unless the rule is tagged `lint-genfiles`.
+
+    Args:
+        rule: the `ctx.rule` of the aspect evaluation
+        source_attributes: names of the rule's label-list attributes that hold files to lint;
+            attributes the rule does not declare are skipped
+
+    Returns:
+        list of File objects to lint
+    """
+    srcs = []
+    for attr_name in source_attributes:
+        srcs.extend(getattr(rule.files, attr_name, []))
     if "lint-genfiles" in rule.attr.tags:
-        return rule.files.srcs
-    else:
-        return [s for s in rule.files.srcs if s.is_source and s.owner.workspace_name == ""]
+        return srcs
+    return [s for s in srcs if s.is_source and s.owner.workspace_name == ""]
 
 def noop_lint_action(ctx, outputs):
     """Action that creates expected outputs when no files are provided to a lint action.
